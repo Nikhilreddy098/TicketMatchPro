@@ -11,8 +11,8 @@ import { loginSchema } from '../../utils/validation';
 export default function LoginScreen() {
   const router = useRouter();
   const { login, isLoading } = useAuth();
-  const [email, setEmail] = useState<string>('demo@ticketmatchpro.app');
-  const [password, setPassword] = useState<string>('Demo@12345');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const handleLogin = async () => {
@@ -85,6 +85,10 @@ export default function LoginScreen() {
 
         <Button title="Sign In" onPress={handleLogin} loading={isLoading} size="large" style={styles.signInBtn} />
 
+        <TouchableOpacity activeOpacity={0.8} style={styles.phoneAuthBtn} onPress={() => router.push('/phone-auth' as any)}>
+          <Text style={styles.phoneAuthBtnText}>📱 Sign In with Mobile OTP (+91)</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity activeOpacity={0.8} style={styles.demoBtn} onPress={handleDemoAccountLogin}>
           <Text style={styles.demoBtnText}>⚡ Use Demo Account (demo@ticketmatchpro.app)</Text>
         </TouchableOpacity>
@@ -155,7 +159,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   signInBtn: {
-    marginBottom: 12,
+    marginBottom: 10,
+  },
+  phoneAuthBtn: {
+    backgroundColor: 'rgba(124, 58, 237, 0.15)',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(124, 58, 237, 0.3)',
+    marginBottom: 10,
+  },
+  phoneAuthBtnText: {
+    color: COLORS.secondary,
+    fontSize: 13,
+    fontWeight: '700',
   },
   demoBtn: {
     backgroundColor: 'rgba(34, 197, 94, 0.15)',

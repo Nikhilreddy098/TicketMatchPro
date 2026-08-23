@@ -8,16 +8,16 @@ import { getCurrentUserProfile, loginWithEmail, registerWithEmail, logoutUser, D
 import { COLORS } from '../constants/colors';
 
 export default function RootLayout() {
-  const [user, setUser] = useState<UserProfile | null>(DEMO_USER);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const initAuth = async () => {
       try {
         const profile = await getCurrentUserProfile();
-        setUser(profile || DEMO_USER);
+        setUser(profile || null);
       } catch (e) {
-        setUser(DEMO_USER);
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
