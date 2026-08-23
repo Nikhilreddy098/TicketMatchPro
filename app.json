@@ -16,7 +16,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#09090B"
       },
-      "package": "com.ticketmatchpro.app"
+      "package": "com.ticketmatchpro.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -35,6 +38,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "54096ee7-df7b-4b51-bdf3-176e52e2144a"
+      }
+    },
+    "owner": "nikhilreddy1407"
   }
 }

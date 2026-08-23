@@ -1,10 +1,12 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
     "module": "commonjs",
     "target": "es2020",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "types": ["node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
