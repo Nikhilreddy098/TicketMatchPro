@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../../hooks/useAuth';
 import { getUserFavorites } from '../../services/favorites';
 import { getTickets } from '../../services/tickets';
 import { TicketCard } from '../../components/TicketCard';
 import { EmptyState } from '../../components/EmptyState';
-import { Loading } from '../../components/Loading';
+import { Skeleton } from '../../components/Skeleton';
 import { Ticket } from '../../types/ticket';
 import { COLORS } from '../../constants/colors';
 
@@ -42,11 +42,14 @@ export default function FavoritesScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <Loading message="Loading saved favorites..." />
+        <View style={{ padding: 16, gap: 14 }}>
+          <Skeleton width="100%" height={160} borderRadius={20} />
+          <Skeleton width="100%" height={160} borderRadius={20} />
+        </View>
       ) : favoriteTickets.length === 0 ? (
         <EmptyState
-          title="No Favorite Tickets Saved"
-          description="Save tickets you are interested in by tapping the heart icon on any ticket card to keep track of them."
+          title="Nothing saved yet"
+          description="Save tickets and events you love to find them here."
           buttonTitle="Explore Tickets"
           onButtonPress={() => router.push('/(tabs)/search')}
         />
@@ -77,6 +80,6 @@ const styles = StyleSheet.create({
   },
   listContent: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 90,
   },
 });

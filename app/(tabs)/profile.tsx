@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'rea
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
-  User,
   Ticket,
+  ShoppingBag,
   ArrowRightLeft,
   Heart,
   Bell,
   Settings as SettingsIcon,
+  HelpCircle,
   LogOut,
   ShieldCheck,
   Star,
@@ -44,7 +45,7 @@ export default function ProfileScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Profile Card Header */}
         <View style={styles.profileHeaderCard}>
-          <Avatar url={user?.avatar_url} name={user?.full_name} size={76} isVerified={user?.is_verified} />
+          <Avatar url={user?.avatar_url} name={user?.full_name} size={80} isVerified={user?.is_verified} />
 
           <Text style={styles.userName}>{user?.full_name || 'Guest User'}</Text>
           <Text style={styles.userEmail}>{user?.email}</Text>
@@ -100,21 +101,21 @@ export default function ProfileScreen() {
             onPress={() => router.push('/admin')}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <ShieldAlert size={20} color={COLORS.secondary} />
+              <ShieldAlert size={20} color={COLORS.primary} />
               <View style={{ marginLeft: 10 }}>
                 <Text style={styles.adminBannerTitle}>Admin Control Center</Text>
                 <Text style={styles.adminBannerSub}>Moderate listings, users & transactions</Text>
               </View>
             </View>
-            <ChevronRight size={18} color={COLORS.secondary} />
+            <ChevronRight size={18} color={COLORS.primary} />
           </TouchableOpacity>
         )}
 
         {/* Menu Options */}
         <View style={styles.menuGroup}>
-          <Text style={styles.menuSectionHeader}>Account & Marketplace</Text>
+          <Text style={styles.menuSectionHeader}>My Activity</Text>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/my-tickets')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/my-tickets')} activeOpacity={0.7}>
             <View style={styles.menuIconCircle}>
               <Ticket size={18} color={COLORS.primary} />
             </View>
@@ -122,7 +123,15 @@ export default function ProfileScreen() {
             <ChevronRight size={16} color={COLORS.textMuted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/exchange/index')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/orders')} activeOpacity={0.7}>
+            <View style={styles.menuIconCircle}>
+              <ShoppingBag size={18} color={COLORS.primary} />
+            </View>
+            <Text style={styles.menuText}>My Orders</Text>
+            <ChevronRight size={16} color={COLORS.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/exchange/index')} activeOpacity={0.7}>
             <View style={styles.menuIconCircle}>
               <ArrowRightLeft size={18} color={COLORS.secondary} />
             </View>
@@ -130,15 +139,7 @@ export default function ProfileScreen() {
             <ChevronRight size={16} color={COLORS.textMuted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/verify-ticket')}>
-            <View style={styles.menuIconCircle}>
-              <QrCode size={18} color={COLORS.success} />
-            </View>
-            <Text style={styles.menuText}>Verify Ticket QR Code</Text>
-            <ChevronRight size={16} color={COLORS.textMuted} />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/(tabs)/favorites')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/(tabs)/favorites')} activeOpacity={0.7}>
             <View style={styles.menuIconCircle}>
               <Heart size={18} color={COLORS.error} />
             </View>
@@ -146,7 +147,7 @@ export default function ProfileScreen() {
             <ChevronRight size={16} color={COLORS.textMuted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/notifications')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/notifications')} activeOpacity={0.7}>
             <View style={styles.menuIconCircle}>
               <Bell size={18} color={COLORS.warning} />
             </View>
@@ -156,21 +157,37 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.menuGroup}>
-          <Text style={styles.menuSectionHeader}>Preferences & Help</Text>
+          <Text style={styles.menuSectionHeader}>Settings & Support</Text>
 
-          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/settings')}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/verify-ticket')} activeOpacity={0.7}>
             <View style={styles.menuIconCircle}>
-              <SettingsIcon size={18} color={COLORS.textSecondary} />
+              <QrCode size={18} color={COLORS.success} />
             </View>
-            <Text style={styles.menuText}>Settings & Privacy</Text>
+            <Text style={styles.menuText}>Verify Ticket QR Code</Text>
             <ChevronRight size={16} color={COLORS.textMuted} />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
-            <View style={[styles.menuIconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/settings')} activeOpacity={0.7}>
+            <View style={styles.menuIconCircle}>
+              <SettingsIcon size={18} color={COLORS.textSecondary} />
+            </View>
+            <Text style={styles.menuText}>Settings & Preferences</Text>
+            <ChevronRight size={16} color={COLORS.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/settings')} activeOpacity={0.7}>
+            <View style={styles.menuIconCircle}>
+              <HelpCircle size={18} color={COLORS.primary} />
+            </View>
+            <Text style={styles.menuText}>Help & Support</Text>
+            <ChevronRight size={16} color={COLORS.textMuted} />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.menuItem, { borderBottomWidth: 0 }]} onPress={handleLogout} activeOpacity={0.7}>
+            <View style={[styles.menuIconCircle, { backgroundColor: COLORS.errorBg }]}>
               <LogOut size={18} color={COLORS.error} />
             </View>
-            <Text style={[styles.menuText, { color: COLORS.error }]}>Sign Out</Text>
+            <Text style={[styles.menuText, { color: COLORS.error }]}>Logout</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -185,20 +202,25 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 90,
   },
   profileHeaderCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 24,
+    padding: 24,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   userName: {
-    color: COLORS.white,
-    fontSize: 20,
+    color: COLORS.textMain,
+    fontSize: 22,
     fontWeight: '800',
     marginTop: 12,
   },
@@ -208,8 +230,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   userBio: {
-    color: COLORS.textMuted,
-    fontSize: 12,
+    color: COLORS.textSecondary,
+    fontSize: 13,
     textAlign: 'center',
     marginTop: 6,
     paddingHorizontal: 16,
@@ -223,9 +245,9 @@ const styles = StyleSheet.create({
   verifiedBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(34, 197, 94, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: COLORS.successBg,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 12,
   },
   verifiedBadgeText: {
@@ -237,9 +259,9 @@ const styles = StyleSheet.create({
   ratingBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    backgroundColor: COLORS.warningBg,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: 12,
   },
   ratingBadgeText: {
@@ -254,92 +276,97 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     backgroundColor: COLORS.background,
-    borderRadius: 14,
-    paddingVertical: 12,
+    borderRadius: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
-    marginTop: 16,
+    marginTop: 18,
   },
   statBox: {
     alignItems: 'center',
     flex: 1,
   },
   statValue: {
-    color: COLORS.white,
-    fontSize: 17,
+    color: COLORS.textMain,
+    fontSize: 18,
     fontWeight: '800',
   },
   statLabel: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 11,
     marginTop: 2,
   },
   statDivider: {
     width: 1,
-    height: 24,
+    height: 26,
     backgroundColor: COLORS.cardBorder,
   },
   editProfileBtn: {
-    marginTop: 16,
+    marginTop: 18,
     width: '100%',
   },
   adminBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(168, 85, 247, 0.12)',
-    borderRadius: 16,
-    padding: 14,
+    backgroundColor: COLORS.secondaryLight,
+    borderRadius: 18,
+    padding: 16,
     borderWidth: 1,
-    borderColor: 'rgba(168, 85, 247, 0.3)',
+    borderColor: 'rgba(108, 59, 255, 0.2)',
     marginBottom: 16,
   },
   adminBannerTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   adminBannerSub: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: 12,
     marginTop: 2,
   },
   menuGroup: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 14,
+    borderRadius: 24,
+    padding: 16,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   menuSectionHeader: {
     color: COLORS.textMuted,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
     textTransform: 'uppercase',
-    marginBottom: 10,
+    marginBottom: 12,
     marginLeft: 4,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 13,
     paddingHorizontal: 4,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(39, 39, 42, 0.5)',
+    borderBottomColor: COLORS.cardBorder,
   },
   menuIconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     backgroundColor: COLORS.background,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 14,
   },
   menuText: {
     flex: 1,
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

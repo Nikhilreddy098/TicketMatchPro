@@ -49,6 +49,7 @@
     "@babel/core": "^7.25.2",
     "@types/node": "^26.2.0",
     "@types/react": "^19.0.0",
+    "exceljs": "^4.4.0",
     "typescript": "~6.0.3"
   },
   "private": true

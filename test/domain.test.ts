@@ -53,7 +53,7 @@ describe('TicketMatchPro Automated Test Suite (15 Test Cases)', () => {
     assert.strictEqual(matchRes.success, true);
   });
 
-  test('TestCase 5: Ticket listing validation checks required fields', () => {
+  test('TestCase 5: Ticket listing validation checks required fields and rejects invalid prices', () => {
     const validListing = ticketListingSchema.safeParse({
       eventName: 'Coldplay Concert 2026',
       categoryId: '11111111-1111-1111-1111-111111111111',
@@ -71,6 +71,61 @@ describe('TicketMatchPro Automated Test Suite (15 Test Cases)', () => {
       description: 'Great seats',
     });
     assert.strictEqual(validListing.success, true);
+
+    const invalidListing = ticketListingSchema.safeParse({
+      eventName: '',
+      categoryId: '',
+      eventDate: '',
+      eventTime: '',
+      venue: '',
+      city: '',
+      ticketType: 'VIP',
+      section: 'A',
+      row: 'R1',
+      seat: 'A-10',
+      quantity: 0,
+      originalPrice: -100,
+      sellingPrice: -50,
+    });
+    assert.strictEqual(invalidListing.success, false);
+  });
+
+  test('TestCase 5b: Successful ticket listing creation associates authenticated seller UUID', async () => {
+    const created = await createTicketListing({
+      seller_id: 'uuid-test-seller-123',
+      event_name: 'AR Rahman Live In Concert',
+      category_id: '11111111-1111-1111-1111-111111111111',
+      category_name: 'Concerts',
+      event_date: '2026-11-10',
+      event_time: '19:30',
+      venue: 'JLN Stadium',
+      city: 'Delhi',
+      ticket_type: 'Gold',
+      section: 'A',
+      row: 'R2',
+      seat: 'S-12',
+      quantity: 2,
+      original_price: 3000,
+      selling_price: 2500,
+      description: 'Live concert pass',
+      image_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745',
+    });
+
+    assert.ok(created.id.length > 0);
+    assert.strictEqual(created.seller_id, 'uuid-test-seller-123');
+    assert.strictEqual(created.status, 'active');
+  });
+
+  test('TestCase 5c: Fetching listings returns active listings array', async () => {
+    const listings = await getTickets();
+    assert.ok(Array.isArray(listings));
+    assert.ok(listings.length > 0);
+  });
+
+  test('TestCase 5d: Empty listing state returns empty array when query matches nothing', async () => {
+    const emptyListings = await getTickets({ query: 'NON_EXISTENT_UNMATCHABLE_EVENT_NAME_999999' });
+    assert.ok(Array.isArray(emptyListings));
+    assert.strictEqual(emptyListings.length, 0);
   });
 
   // 3. PAYMENT PORTAL & DEMO MODE TESTS

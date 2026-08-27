@@ -36,7 +36,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({
     <TouchableOpacity activeOpacity={0.9} onPress={onPress} style={styles.card}>
       <View style={styles.header}>
         <Image source={{ uri: ticket.image_url }} style={styles.image} />
-        <TouchableOpacity style={styles.favoriteButton} onPress={handleFavoriteToggle}>
+        <TouchableOpacity style={styles.favoriteButton} onPress={handleFavoriteToggle} activeOpacity={0.8}>
           <Heart size={18} color={isFav ? COLORS.error : COLORS.white} fill={isFav ? COLORS.error : 'transparent'} />
         </TouchableOpacity>
         <View style={styles.categoryTag}>
@@ -100,7 +100,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({
           <View style={styles.actionButtonsRow}>
             {onExchangePress && (
               <TouchableOpacity activeOpacity={0.8} style={styles.exchangeBtn} onPress={onExchangePress}>
-                <ArrowRightLeft size={14} color={COLORS.secondary} />
+                <ArrowRightLeft size={14} color={COLORS.primary} />
                 <Text style={styles.exchangeBtnText}>Exchange</Text>
               </TouchableOpacity>
             )}
@@ -119,16 +119,22 @@ export const TicketCard: React.FC<TicketCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
     overflow: 'hidden',
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   header: {
-    height: 120,
+    height: 125,
     width: '100%',
     position: 'relative',
+    backgroundColor: '#E9E9EF',
   },
   image: {
     width: '100%',
@@ -138,7 +144,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    backgroundColor: 'rgba(9, 9, 11, 0.65)',
+    backgroundColor: 'rgba(17, 17, 20, 0.45)',
     padding: 8,
     borderRadius: 20,
   },
@@ -149,7 +155,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 6,
+    borderRadius: 8,
   },
   categoryText: {
     color: COLORS.white,
@@ -157,10 +163,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   body: {
-    padding: 14,
+    padding: 16,
   },
   eventName: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 6,
@@ -168,7 +174,7 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   metaItem: {
     flexDirection: 'row',
@@ -185,15 +191,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     alignSelf: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   seatText: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 12,
   },
   seatHighlight: {
-    color: COLORS.white,
-    fontWeight: '600',
+    color: COLORS.textMain,
+    fontWeight: '700',
   },
   divider: {
     height: 1,
@@ -214,7 +220,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   sellerName: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -238,30 +244,28 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   sellingPrice: {
-    color: COLORS.success,
-    fontSize: 17,
-    fontWeight: '700',
+    color: COLORS.primary,
+    fontSize: 18,
+    fontWeight: '800',
   },
   actionButtonsRow: {
     flexDirection: 'row',
-    marginTop: 12,
-    gap: 8,
+    marginTop: 14,
+    gap: 10,
   },
   exchangeBtn: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(168, 85, 247, 0.15)',
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(168, 85, 247, 0.3)',
+    backgroundColor: COLORS.secondaryLight,
+    paddingVertical: 11,
+    borderRadius: 12,
   },
   exchangeBtnText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
     marginLeft: 6,
   },
   buyBtn: {
@@ -269,8 +273,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.primary,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: 11,
+    borderRadius: 12,
   },
   buyBtnText: {
     color: COLORS.white,

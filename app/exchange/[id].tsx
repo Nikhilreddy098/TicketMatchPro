@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowRightLeft, CheckCircle2, XCircle, ShieldCheck } from 'lucide-react-native';
-import { getUserExchanges, updateExchangeStatus } from '../../services/exchange';
+import { getExchangeRequestById, acceptExchangeRequest, rejectExchangeRequest, cancelExchangeRequest } from '../../services/exchange';
 import { useAuth } from '../../hooks/useAuth';
 import { ExchangeRequest } from '../../types/exchange';
 import { Button } from '../../components/Button';
 import { Avatar } from '../../components/Avatar';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
-import { formatDate } from '../../utils/formatting';
+import { formatDate, formatCurrency } from '../../utils/formatting';
 
 export default function ExchangeDetailsScreen() {
   const router = useRouter();
@@ -21,11 +21,14 @@ export default function ExchangeDetailsScreen() {
 
   useEffect(() => {
     const loadExchange = async () => {
-      if (!user || !id) return;
+      if (!user || !id) {
+        setLoading(false);
+        return;
+      }
       try {
-        const all = await getUserExchanges(user.id);
-        const item = all.find((e) => e.id === id);
-        setExchange(item || null);
+        setLoading(true);
+        const item = await getExchangeRequestById(id);
+        setExchange(item);
       } catch (e) {
       } finally {
         setLoading(false);
@@ -34,30 +37,58 @@ export default function ExchangeDetailsScreen() {
     loadExchange();
   }, [id, user]);
 
-  const handleAction = async (status: 'accepted' | 'rejected' | 'cancelled') => {
-    if (!exchange) return;
+  const handleAccept = async () => {
+    if (!exchange || !user) return;
     setUpdating(true);
     try {
-      await updateExchangeStatus(exchange.id, status);
-      setExchange((prev) => (prev ? { ...prev, status } : null));
-
-      if (status === 'accepted') {
-        Alert.alert(
-          'Exchange Accepted! 🎉',
-          'Both tickets have been locked from further sales/exchanges and ownership has been updated.'
-        );
-      } else {
-        Alert.alert('Status Updated', `Exchange request status changed to ${status}.`);
-      }
+      await acceptExchangeRequest(exchange.id, user.id);
+      setExchange((prev) => (prev ? { ...prev, status: 'accepted' } : null));
+      Alert.alert('Exchange Accepted! 🎉', 'Both tickets have been marked as exchanged in the marketplace.');
     } catch (e: any) {
-      Alert.alert('Error', e?.message || 'Failed to update exchange status.');
+      Alert.alert('Error', e?.message || 'Failed to accept exchange request.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!exchange || !user) return;
+    setUpdating(true);
+    try {
+      await rejectExchangeRequest(exchange.id, user.id);
+      setExchange((prev) => (prev ? { ...prev, status: 'rejected' } : null));
+      Alert.alert('Exchange Rejected', 'The exchange request status has been updated to rejected.');
+    } catch (e: any) {
+      Alert.alert('Error', e?.message || 'Failed to reject exchange request.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!exchange || !user) return;
+    setUpdating(true);
+    try {
+      await cancelExchangeRequest(exchange.id, user.id);
+      setExchange((prev) => (prev ? { ...prev, status: 'cancelled' } : null));
+      Alert.alert('Request Cancelled', 'Your exchange request has been cancelled.');
+    } catch (e: any) {
+      Alert.alert('Error', e?.message || 'Failed to cancel exchange request.');
     } finally {
       setUpdating(false);
     }
   };
 
   if (loading) return <Loading message="Loading exchange details..." />;
-  if (!exchange) return null;
+
+  if (!exchange) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>Exchange Request Not Found</Text>
+        <Button title="Back to Exchange Requests" onPress={() => router.replace('/exchange')} style={{ marginTop: 16 }} />
+      </View>
+    );
+  }
 
   const isReceiver = exchange.receiver_id === user?.id;
   const isSender = exchange.sender_id === user?.id;
@@ -73,20 +104,20 @@ export default function ExchangeDetailsScreen() {
       <View style={styles.card}>
         <Text style={styles.sectionHeader}>Exchange Participants</Text>
         <View style={styles.participantRow}>
-          <Avatar url={exchange.sender?.avatar_url} name={exchange.sender?.full_name} size={42} />
-          <View style={{ marginLeft: 10, flex: 1 }}>
+          <Avatar url={exchange.sender?.avatar_url} name={exchange.sender?.full_name} size={44} isVerified={exchange.sender?.is_verified} />
+          <View style={{ marginLeft: 12, flex: 1 }}>
             <Text style={styles.participantName}>{exchange.sender?.full_name || 'Sender'}</Text>
-            <Text style={styles.participantRole}>Sender (Offered Ticket)</Text>
+            <Text style={styles.participantRole}>Sender (Offered Ticket Owner)</Text>
           </View>
         </View>
 
         <View style={styles.divider} />
 
         <View style={styles.participantRow}>
-          <Avatar url={exchange.receiver?.avatar_url} name={exchange.receiver?.full_name} size={42} />
-          <View style={{ marginLeft: 10, flex: 1 }}>
+          <Avatar url={exchange.receiver?.avatar_url} name={exchange.receiver?.full_name} size={44} isVerified={exchange.receiver?.is_verified} />
+          <View style={{ marginLeft: 12, flex: 1 }}>
             <Text style={styles.participantName}>{exchange.receiver?.full_name || 'Receiver'}</Text>
-            <Text style={styles.participantRole}>Receiver (Requested Ticket)</Text>
+            <Text style={styles.participantRole}>Receiver (Requested Ticket Seller)</Text>
           </View>
         </View>
       </View>
@@ -98,27 +129,42 @@ export default function ExchangeDetailsScreen() {
         <View style={styles.ticketBox}>
           <Text style={styles.ticketBoxTag}>OFFERED TICKET</Text>
           <Text style={styles.ticketBoxTitle}>
-            {exchange.offered_ticket?.event_name || 'Summer Beats VIP Gold'}
+            {exchange.offered_ticket?.event_name || 'Offered Event Ticket'}
           </Text>
           <Text style={styles.ticketBoxSub}>
-            Venue: {exchange.offered_ticket?.venue || 'JLN Stadium'} • Sec {exchange.offered_ticket?.section || 'Zone A'}
+            Venue: {exchange.offered_ticket?.venue || 'N/A'}, {exchange.offered_ticket?.city || ''} • Sec {exchange.offered_ticket?.section || 'A'}
           </Text>
+          {exchange.offered_ticket?.selling_price ? (
+            <Text style={styles.ticketPrice}>{formatCurrency(exchange.offered_ticket.selling_price)}</Text>
+          ) : null}
         </View>
 
         <View style={styles.swapIconRow}>
-          <ArrowRightLeft size={24} color={COLORS.primary} />
+          <View style={styles.swapIconCircle}>
+            <ArrowRightLeft size={22} color={COLORS.primary} />
+          </View>
         </View>
 
         <View style={styles.ticketBox}>
           <Text style={styles.ticketBoxTag}>REQUESTED TICKET</Text>
           <Text style={styles.ticketBoxTitle}>
-            {exchange.requested_ticket?.event_name || 'Chennai Cultural Fest'}
+            {exchange.requested_ticket?.event_name || 'Requested Event Ticket'}
           </Text>
           <Text style={styles.ticketBoxSub}>
-            Venue: {exchange.requested_ticket?.venue || 'Kalakshetra Ground'} • Sec {exchange.requested_ticket?.section || 'Lawn'}
+            Venue: {exchange.requested_ticket?.venue || 'N/A'}, {exchange.requested_ticket?.city || ''} • Sec {exchange.requested_ticket?.section || 'A'}
           </Text>
+          {exchange.requested_ticket?.selling_price ? (
+            <Text style={styles.ticketPrice}>{formatCurrency(exchange.requested_ticket.selling_price)}</Text>
+          ) : null}
         </View>
       </View>
+
+      {exchange.message ? (
+        <View style={styles.card}>
+          <Text style={styles.sectionHeader}>Requester Note</Text>
+          <Text style={styles.noteText}>"{exchange.message}"</Text>
+        </View>
+      ) : null}
 
       {/* Action Buttons */}
       {exchange.status === 'pending' && (
@@ -127,7 +173,7 @@ export default function ExchangeDetailsScreen() {
             <>
               <Button
                 title="Accept Exchange"
-                onPress={() => handleAction('accepted')}
+                onPress={handleAccept}
                 loading={updating}
                 icon={<CheckCircle2 size={18} color={COLORS.white} />}
                 style={{ flex: 1, backgroundColor: COLORS.success }}
@@ -135,7 +181,7 @@ export default function ExchangeDetailsScreen() {
               <Button
                 title="Reject"
                 variant="danger"
-                onPress={() => handleAction('rejected')}
+                onPress={handleReject}
                 loading={updating}
                 icon={<XCircle size={18} color={COLORS.white} />}
                 style={{ flex: 1 }}
@@ -147,7 +193,7 @@ export default function ExchangeDetailsScreen() {
             <Button
               title="Cancel Exchange Request"
               variant="outline"
-              onPress={() => handleAction('cancelled')}
+              onPress={handleCancel}
               loading={updating}
               style={{ width: '100%' }}
             />
@@ -159,7 +205,7 @@ export default function ExchangeDetailsScreen() {
         <View style={styles.lockedNotice}>
           <ShieldCheck size={20} color={COLORS.success} />
           <Text style={styles.lockedText}>
-            This exchange has been completed! Both tickets have been locked from further marketplace actions.
+            This exchange request has been accepted! Both tickets have been marked as exchanged in the marketplace.
           </Text>
         </View>
       )}
@@ -175,12 +221,17 @@ const styles = StyleSheet.create({
   },
   headerBox: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 24,
+    padding: 18,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   statusLabel: {
     color: COLORS.primary,
@@ -189,22 +240,28 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   createdDate: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 4,
+    fontWeight: '600',
   },
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 16,
+    borderRadius: 24,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   sectionHeader: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '700',
+    color: COLORS.textMain,
+    fontSize: 16,
+    fontWeight: '800',
     marginBottom: 12,
   },
   participantRow: {
@@ -212,14 +269,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   participantName: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   participantRole: {
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
+    fontWeight: '600',
   },
   divider: {
     height: 1,
@@ -228,8 +286,8 @@ const styles = StyleSheet.create({
   },
   ticketBox: {
     backgroundColor: COLORS.background,
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 16,
+    padding: 14,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
   },
@@ -240,18 +298,41 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   ticketBoxTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   ticketBoxSub: {
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
+    fontWeight: '600',
+  },
+  ticketPrice: {
+    color: COLORS.success,
+    fontSize: 14,
+    fontWeight: '800',
+    marginTop: 6,
   },
   swapIconRow: {
     alignItems: 'center',
     marginVertical: 10,
+  },
+  swapIconCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.secondaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(108, 59, 255, 0.2)',
+  },
+  noteText: {
+    color: COLORS.textSecondary,
+    fontSize: 14,
+    fontStyle: 'italic',
+    lineHeight: 20,
   },
   actionsBox: {
     flexDirection: 'row',
@@ -261,9 +342,9 @@ const styles = StyleSheet.create({
   lockedNotice: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(34, 197, 94, 0.15)',
-    borderRadius: 16,
-    padding: 14,
+    backgroundColor: COLORS.successBg,
+    borderRadius: 20,
+    padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(34, 197, 94, 0.3)',
     marginTop: 8,
@@ -274,6 +355,18 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
     lineHeight: 18,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: COLORS.background,
+  },
+  errorTitle: {
+    color: COLORS.textMain,
+    fontSize: 18,
+    fontWeight: '800',
   },
 });

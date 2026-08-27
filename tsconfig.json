@@ -20,6 +20,7 @@
     "supabase/functions/**/*",
     "dist_test/**/*",
     "test/**/*",
+    "web/**/*",
     "node_modules"
   ]
 }

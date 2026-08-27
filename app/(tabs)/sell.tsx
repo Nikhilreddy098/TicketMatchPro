@@ -93,9 +93,10 @@ export default function SellScreen() {
       return;
     }
 
+    console.log('[TICKET CREATE] authenticated user id:', user.id);
     setLoading(true);
     try {
-      await createTicketListing({
+      const created = await createTicketListing({
         seller_id: user.id,
         event_name: eventName,
         category_id: selectedCategory.id,
@@ -116,6 +117,8 @@ export default function SellScreen() {
         seller: user,
       });
 
+      console.log('[TICKET CREATE CONFIRMED] created ticket id:', created.id);
+
       Alert.alert('Listing Created! 🎉', 'Your ticket has been published to the marketplace.', [
         {
           text: 'View My Tickets',
@@ -132,9 +135,9 @@ export default function SellScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
       <View style={styles.headerBox}>
-        <Text style={styles.headerTitle}>Sell or Exchange Ticket</Text>
+        <Text style={styles.headerTitle}>Sell your ticket</Text>
         <Text style={styles.headerSubtitle}>
-          Reach thousands of buyers safely. Instant verification & direct payout.
+          Turn your unused ticket into someone else's next experience.
         </Text>
       </View>
 
@@ -159,7 +162,7 @@ export default function SellScreen() {
 
       <View style={styles.formCard}>
         {/* Category Picker */}
-        <Text style={styles.sectionLabel}>Select Category</Text>
+        <Text style={styles.sectionLabel}>Event Category</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
           {CATEGORIES.map((cat) => (
             <CategoryCard
@@ -171,6 +174,7 @@ export default function SellScreen() {
           ))}
         </ScrollView>
 
+        <Text style={styles.sectionHeaderTitle}>Event Details</Text>
         <Input
           label="Event Name"
           placeholder="e.g. Coldplay Music Of The Spheres"
@@ -226,7 +230,7 @@ export default function SellScreen() {
         </View>
 
         {/* Seat / Section details */}
-        <Text style={styles.sectionLabel}>Seating Details</Text>
+        <Text style={styles.sectionHeaderTitle}>Ticket Details</Text>
         <View style={styles.rowThree}>
           <View style={{ flex: 1, marginRight: 6 }}>
             <Input label="Section" placeholder="Sec A" value={section} onChangeText={setSection} error={errors.section} />
@@ -240,14 +244,14 @@ export default function SellScreen() {
         </View>
 
         {/* Quantity & Pricing */}
-        <Text style={styles.sectionLabel}>Pricing & Quantity</Text>
+        <Text style={styles.sectionHeaderTitle}>Pricing & Quantity</Text>
         <View style={styles.rowThree}>
           <View style={{ flex: 1, marginRight: 6 }}>
             <Input label="Quantity" placeholder="1" value={quantity} onChangeText={setQuantity} keyboardType="numeric" />
           </View>
           <View style={{ flex: 1, marginHorizontal: 4 }}>
             <Input
-              label="Original Price (₹)"
+              label="Original (₹)"
               placeholder="3500"
               value={originalPrice}
               onChangeText={setOriginalPrice}
@@ -257,7 +261,7 @@ export default function SellScreen() {
           </View>
           <View style={{ flex: 1, marginLeft: 6 }}>
             <Input
-              label="Selling Price (₹)"
+              label="Selling (₹)"
               placeholder="2800"
               value={sellingPrice}
               onChangeText={setSellingPrice}
@@ -267,8 +271,9 @@ export default function SellScreen() {
           </View>
         </View>
 
+        <Text style={styles.sectionHeaderTitle}>Description</Text>
         <Input
-          label="Additional Description (Optional)"
+          label="Notes (Optional)"
           placeholder="Mention food pass, backstage access, or delivery notes..."
           value={description}
           onChangeText={setDescription}
@@ -278,7 +283,7 @@ export default function SellScreen() {
         />
 
         <Button
-          title="Publish Ticket Listing"
+          title="Publish Ticket"
           onPress={handleListTicket}
           loading={loading}
           size="large"
@@ -293,31 +298,37 @@ export default function SellScreen() {
 const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 90,
     backgroundColor: COLORS.background,
   },
   headerBox: {
     marginBottom: 16,
   },
   headerTitle: {
-    color: COLORS.white,
-    fontSize: 22,
+    color: COLORS.textMain,
+    fontSize: 24,
     fontWeight: '800',
   },
   headerSubtitle: {
     color: COLORS.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     marginTop: 4,
+    lineHeight: 20,
   },
   imagePickerCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     borderStyle: 'dashed',
-    height: 150,
+    height: 160,
     overflow: 'hidden',
     marginBottom: 20,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 6,
+    elevation: 2,
   },
   imagePreviewContainer: {
     width: '100%',
@@ -330,12 +341,12 @@ const styles = StyleSheet.create({
   },
   imageOverlayBadge: {
     position: 'absolute',
-    bottom: 10,
-    right: 10,
-    backgroundColor: 'rgba(9, 9, 11, 0.75)',
-    paddingHorizontal: 10,
+    bottom: 12,
+    right: 12,
+    backgroundColor: 'rgba(17, 17, 20, 0.75)',
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -352,29 +363,43 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   uploadTitle: {
-    color: COLORS.white,
-    fontSize: 14,
-    fontWeight: '600',
+    color: COLORS.textMain,
+    fontSize: 15,
+    fontWeight: '700',
     marginTop: 8,
   },
   uploadSub: {
-    color: COLORS.textMuted,
-    fontSize: 11,
+    color: COLORS.textSecondary,
+    fontSize: 12,
     marginTop: 2,
   },
   formCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 24,
+    padding: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   sectionLabel: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 10,
-    marginTop: 4,
+  },
+  sectionHeaderTitle: {
+    color: COLORS.textMain,
+    fontSize: 16,
+    fontWeight: '800',
+    marginTop: 10,
+    marginBottom: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.cardBorder,
   },
   rowTwo: {
     flexDirection: 'row',
@@ -383,6 +408,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   publishBtn: {
-    marginTop: 12,
+    marginTop: 16,
   },
 });

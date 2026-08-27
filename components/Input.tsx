@@ -17,7 +17,7 @@ export const Input: React.FC<InputProps> = ({ label, error, leftIcon, rightIcon,
         {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
         <TextInput
           placeholderTextColor={COLORS.textMuted}
-          style={[styles.input, leftIcon ? { paddingLeft: 40 } : null, rightIcon ? { paddingRight: 40 } : null, style]}
+          style={[styles.input, leftIcon ? { paddingLeft: 42 } : null, rightIcon ? { paddingRight: 42 } : null, style]}
           {...props}
         />
         {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
@@ -33,9 +33,9 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     marginBottom: 6,
   },
   inputWrapper: {
@@ -50,24 +50,25 @@ const styles = StyleSheet.create({
     borderColor: COLORS.error,
   },
   input: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 15,
-    paddingVertical: 12,
+    paddingVertical: 13,
     paddingHorizontal: 16,
   },
   leftIcon: {
     position: 'absolute',
-    left: 12,
+    left: 14,
     zIndex: 1,
   },
   rightIcon: {
     position: 'absolute',
-    right: 12,
+    right: 14,
     zIndex: 1,
   },
   errorText: {
     color: COLORS.error,
     fontSize: 12,
     marginTop: 4,
+    fontWeight: '500',
   },
 });

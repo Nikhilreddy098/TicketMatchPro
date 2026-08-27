@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { Ticket, ShoppingBag, ArrowRightLeft, Edit3, QrCode } from 'lucide-react-native';
 import { useAuth } from '../hooks/useAuth';
 import { getUserListings } from '../services/tickets';
@@ -24,8 +24,14 @@ export default function MyTicketsScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const loadData = async () => {
-    if (!user) return;
+  const loadData = useCallback(async () => {
+    if (!user) {
+      setListings([]);
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+    console.log('[MY TICKETS SCREEN] loading data for user.id:', user.id);
     try {
       setLoading(true);
       const userListings = await getUserListings(user.id);
@@ -33,15 +39,18 @@ export default function MyTicketsScreen() {
 
       const userOrders = await getUserOrders(user.id);
       setOrders(userOrders);
-    } catch (e) {
+    } catch (e: any) {
+      console.error('[MY TICKETS SCREEN ERROR]', e?.message);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadData();
   }, [user]);
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [loadData])
+  );
 
   const soldListings = listings.filter((l) => l.status === 'sold');
   const myActiveListings = listings.filter((l) => l.status !== 'sold');
@@ -184,7 +193,7 @@ const styles = StyleSheet.create({
     padding: 6,
     margin: 16,
     marginBottom: 8,
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
   },
@@ -192,13 +201,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 12,
   },
   tabChipActive: {
     backgroundColor: COLORS.primary,
   },
   tabText: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -209,7 +218,7 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     paddingTop: 8,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
   cardWrapper: {
     marginBottom: 8,
@@ -222,54 +231,60 @@ const styles = StyleSheet.create({
   editBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
+    backgroundColor: COLORS.secondaryLight,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(124, 58, 237, 0.3)',
+    borderColor: 'rgba(108, 59, 255, 0.2)',
   },
   editBtnText: {
     color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     marginLeft: 6,
   },
   orderCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
-    marginBottom: 12,
+    marginBottom: 14,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   orderHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   orderTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   orderSub: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
+    fontWeight: '600',
   },
   orderPrice: {
     color: COLORS.success,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   qrTicketBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.primary,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: 12,
+    borderRadius: 12,
   },
   qrTicketBtnText: {
     color: COLORS.white,

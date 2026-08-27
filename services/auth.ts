@@ -32,6 +32,24 @@ export const getCurrentUserProfile = async (): Promise<UserProfile | null> => {
           currentUser = profile as UserProfile;
           return currentUser;
         }
+
+        // Create profile if missing
+        const newProf: UserProfile = {
+          id: user.id,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+          email: user.email || '',
+          rating: 5.0,
+          total_sales: 0,
+          total_purchases: 0,
+          total_exchanges: 0,
+          is_verified: true,
+          role: 'user',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        await supabase.from('profiles').upsert(newProf);
+        currentUser = newProf;
+        return currentUser;
       }
     } catch (e) {}
   }
@@ -61,7 +79,7 @@ export const loginWithEmail = async (email: string, pass: string): Promise<{ use
         return { user: profile };
       }
     } catch (e: any) {
-      return { user: null, error: e?.message || 'Login failed' };
+      return { user: null, error: e?.message || 'Login failed.' };
     }
   }
 
@@ -91,22 +109,27 @@ export const registerWithEmail = async (
   fullName: string,
   email: string,
   pass: string
-): Promise<{ user: UserProfile | null; error?: string }> => {
+): Promise<{ user: UserProfile | null; error?: string; needsEmailConfirmation?: boolean }> => {
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanName = fullName.trim();
+
   if (isSupabaseConfigured()) {
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: cleanEmail,
         password: pass,
         options: {
-          data: { full_name: fullName },
+          data: { full_name: cleanName },
         },
       });
+
       if (error) return { user: null, error: error.message };
+
       if (data.user) {
         const newProf: UserProfile = {
           id: data.user.id,
-          full_name: fullName,
-          email,
+          full_name: cleanName,
+          email: cleanEmail,
           rating: 5.0,
           total_sales: 0,
           total_purchases: 0,
@@ -116,19 +139,30 @@ export const registerWithEmail = async (
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
-        await supabase.from('profiles').insert(newProf);
+
+        // Create/upsert user profile in public.profiles using authenticated user's UUID
+        await supabase.from('profiles').upsert(newProf);
+
+        // Check if email confirmation is required (no active session yet)
+        if (!data.session) {
+          return {
+            user: null,
+            needsEmailConfirmation: true,
+          };
+        }
+
         currentUser = newProf;
         return { user: newProf };
       }
     } catch (e: any) {
-      return { user: null, error: e?.message || 'Registration failed' };
+      return { user: null, error: e?.message || 'Registration failed.' };
     }
   }
 
   currentUser = {
     id: `u-${Date.now()}`,
-    full_name: fullName,
-    email,
+    full_name: cleanName,
+    email: cleanEmail,
     rating: 5.0,
     total_sales: 0,
     total_purchases: 0,

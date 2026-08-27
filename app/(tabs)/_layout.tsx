@@ -1,27 +1,50 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
+import React, { useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Tabs, useRouter } from 'expo-router';
 import { Home, Search, PlusCircle, Heart, User } from 'lucide-react-native';
+import { useAuth } from '../../hooks/useAuth';
 import { COLORS } from '../../constants/colors';
 
 export default function TabsLayout() {
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      console.log('[TABS LAYOUT GUARD] Logged out user accessed tabs -> NAVIGATING TO LOGIN');
+      router.replace('/(auth)/login');
+    }
+  }, [user, isLoading, router]);
+
   return (
     <Tabs
       screenOptions={{
         headerStyle: { backgroundColor: COLORS.background },
-        headerTintColor: COLORS.white,
-        headerTitleStyle: { fontWeight: '700' },
+        headerTintColor: COLORS.textMain,
+        headerTitleStyle: { fontWeight: '800' },
         tabBarStyle: {
-          backgroundColor: COLORS.card,
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 1,
           borderTopColor: COLORS.cardBorder,
-          height: 62,
+          height: 64,
           paddingBottom: 8,
           paddingTop: 8,
+          position: 'absolute',
+          bottom: 12,
+          left: 16,
+          right: 16,
+          borderRadius: 24,
+          elevation: 8,
+          shadowColor: COLORS.shadow,
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 1,
+          shadowRadius: 12,
         },
         tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textMuted,
+        tabBarInactiveTintColor: COLORS.textSecondary,
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
+          fontWeight: '700',
         },
         sceneStyle: { backgroundColor: COLORS.background },
       }}
@@ -37,7 +60,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="search"
         options={{
-          title: 'Search',
+          title: 'Browse',
           headerTitle: 'Find Tickets',
           tabBarIcon: ({ color, size }) => <Search size={size} color={color} />,
         }}
@@ -47,7 +70,11 @@ export default function TabsLayout() {
         options={{
           title: 'Sell',
           headerTitle: 'List Your Ticket',
-          tabBarIcon: ({ color, size }) => <PlusCircle size={size + 2} color={color} />,
+          tabBarIcon: ({ color, size, focused }) => (
+            <View style={[styles.sellIconBadge, focused ? styles.sellIconBadgeActive : null]}>
+              <PlusCircle size={size} color={focused ? COLORS.white : COLORS.primary} />
+            </View>
+          ),
         }}
       />
       <Tabs.Screen
@@ -69,3 +96,15 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  sellIconBadge: {
+    padding: 2,
+    borderRadius: 14,
+  },
+  sellIconBadgeActive: {
+    backgroundColor: COLORS.primary,
+    padding: 4,
+    borderRadius: 16,
+  },
+});

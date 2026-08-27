@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Calendar, Clock, MapPin, ShieldCheck, Heart, ArrowRightLeft, MessageSquare, ShoppingBag, Star } from 'lucide-react-native';
+import { Calendar, Clock, MapPin, ShieldCheck, Heart, ArrowRightLeft, MessageSquare, ShoppingBag, Star, UserCheck, CheckCircle } from 'lucide-react-native';
 import { getTicketById } from '../../services/tickets';
 import { startConversation } from '../../services/chat';
 import { toggleFavorite } from '../../services/favorites';
+import { hasPendingExchangeRequest } from '../../services/exchange';
 import { useAuth } from '../../hooks/useAuth';
 import { Ticket } from '../../types/ticket';
 import { Avatar } from '../../components/Avatar';
@@ -20,6 +21,7 @@ export default function TicketDetailsScreen() {
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isFav, setIsFav] = useState<boolean>(false);
+  const [isPendingExchange, setIsPendingExchange] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -29,37 +31,74 @@ export default function TicketDetailsScreen() {
         const data = await getTicketById(id);
         setTicket(data);
         if (data?.is_favorite) setIsFav(true);
+
+        if (user && data) {
+          const hasPending = await hasPendingExchangeRequest(user.id, data.id);
+          setIsPendingExchange(hasPending);
+        }
       } catch (e) {
       } finally {
         setLoading(false);
       }
     };
     fetchDetails();
-  }, [id]);
+  }, [id, user]);
 
   const handleFavoriteToggle = async () => {
-    if (!user || !ticket) return;
+    if (!user || !ticket) {
+      Alert.alert('Sign In Required', 'Please log in to save tickets to your favorites.');
+      return;
+    }
     const newState = await toggleFavorite(user.id, ticket.id);
     setIsFav(newState);
   };
 
   const handleMessageSeller = async () => {
-    if (!user || !ticket) return;
+    if (!user || !ticket) {
+      Alert.alert('Sign In Required', 'Please log in to message sellers.');
+      return;
+    }
     if (ticket.seller_id === user.id) {
       Alert.alert('Notice', 'This is your own ticket listing.');
       return;
     }
-    const conv = await startConversation(ticket.id, user.id, ticket.seller_id);
-    router.push(`/chat/${conv.id}`);
+    try {
+      const conv = await startConversation(ticket.id, user.id, ticket.seller_id);
+      router.push(`/chat/${conv.id}`);
+    } catch (e: any) {
+      Alert.alert('Chat Error', e?.message || 'Could not start conversation.');
+    }
   };
 
   const handleBuy = () => {
     if (!ticket) return;
+    if (user && ticket.seller_id === user.id) {
+      Alert.alert('Own Ticket', 'You cannot buy your own ticket listing.');
+      return;
+    }
     router.push({ pathname: '/payment/checkout', params: { ticketId: ticket.id } });
   };
 
   const handleExchange = () => {
     if (!ticket) return;
+    if (!user) {
+      Alert.alert('Sign In Required', 'Please log in to request a ticket exchange.', [
+        { text: 'Sign In', onPress: () => router.push('/(auth)/login') },
+        { text: 'Cancel', style: 'cancel' },
+      ]);
+      return;
+    }
+    if (ticket.seller_id === user.id) {
+      Alert.alert('Own Ticket', 'This is your ticket. You cannot request an exchange for your own listing.');
+      return;
+    }
+    if (isPendingExchange) {
+      Alert.alert('Pending Request', 'You already have a pending exchange request for this ticket.', [
+        { text: 'View Requests', onPress: () => router.push('/exchange') },
+        { text: 'OK', style: 'cancel' },
+      ]);
+      return;
+    }
     router.push({ pathname: '/exchange/create', params: { targetTicketId: ticket.id } });
   };
 
@@ -75,19 +114,29 @@ export default function TicketDetailsScreen() {
     );
   }
 
+  const isOwner = user?.id === ticket.seller_id;
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         {/* Banner Image Header */}
         <View style={styles.imageCard}>
           <Image source={{ uri: ticket.image_url }} style={styles.bannerImage} />
-          <TouchableOpacity style={styles.favBtn} onPress={handleFavoriteToggle}>
+          <TouchableOpacity style={styles.favBtn} onPress={handleFavoriteToggle} activeOpacity={0.8}>
             <Heart size={20} color={isFav ? COLORS.error : COLORS.white} fill={isFav ? COLORS.error : 'transparent'} />
           </TouchableOpacity>
           <View style={styles.categoryTag}>
             <Text style={styles.categoryText}>{ticket.ticket_type}</Text>
           </View>
         </View>
+
+        {/* Owner Banner Notice */}
+        {isOwner && (
+          <View style={styles.ownerNoticeBanner}>
+            <UserCheck size={18} color={COLORS.primary} />
+            <Text style={styles.ownerNoticeText}>This is your ticket listing</Text>
+          </View>
+        )}
 
         {/* Title & Info Card */}
         <View style={styles.card}>
@@ -126,7 +175,7 @@ export default function TicketDetailsScreen() {
               <Text style={styles.seatValue}>{ticket.seat || 'N/A'}</Text>
             </View>
             <View style={styles.seatBox}>
-              <Text style={styles.seatLabel}>Qty</Text>
+              <Text style={styles.seatLabel}>Quantity</Text>
               <Text style={styles.seatValue}>{ticket.quantity}</Text>
             </View>
           </View>
@@ -163,9 +212,11 @@ export default function TicketDetailsScreen() {
                 </View>
               </View>
 
-              <TouchableOpacity activeOpacity={0.8} style={styles.chatBtn} onPress={handleMessageSeller}>
-                <MessageSquare size={18} color={COLORS.primary} />
-              </TouchableOpacity>
+              {!isOwner && (
+                <TouchableOpacity activeOpacity={0.8} style={styles.chatBtn} onPress={handleMessageSeller}>
+                  <MessageSquare size={18} color={COLORS.primary} />
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         )}
@@ -184,15 +235,43 @@ export default function TicketDetailsScreen() {
         </View>
 
         <View style={styles.bottomActionsGroup}>
-          <TouchableOpacity activeOpacity={0.8} style={styles.exchangeBarBtn} onPress={handleExchange}>
-            <ArrowRightLeft size={16} color={COLORS.secondary} />
-          </TouchableOpacity>
-          <Button
-            title="BUY TICKET"
-            onPress={handleBuy}
-            icon={<ShoppingBag size={16} color={COLORS.white} />}
-            style={styles.buyBarBtn}
-          />
+          {isOwner ? (
+            <View style={styles.ownerBadgeBox}>
+              <Text style={styles.ownerBadgeText}>This is your ticket</Text>
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={[
+                  styles.exchangeBarBtn,
+                  isPendingExchange ? styles.exchangeBarBtnPending : null,
+                ]}
+                onPress={handleExchange}
+              >
+                {isPendingExchange ? (
+                  <CheckCircle size={16} color={COLORS.warning} />
+                ) : (
+                  <ArrowRightLeft size={16} color={COLORS.primary} />
+                )}
+                <Text
+                  style={[
+                    styles.exchangeBarBtnText,
+                    isPendingExchange ? { color: COLORS.warning } : null,
+                  ]}
+                >
+                  {isPendingExchange ? 'Pending' : 'Exchange'}
+                </Text>
+              </TouchableOpacity>
+
+              <Button
+                title="BUY TICKET"
+                onPress={handleBuy}
+                icon={<ShoppingBag size={16} color={COLORS.white} />}
+                style={styles.buyBarBtn}
+              />
+            </>
+          )}
         </View>
       </View>
     </View>
@@ -209,11 +288,13 @@ const styles = StyleSheet.create({
     paddingBottom: 110,
   },
   imageCard: {
-    height: 200,
-    borderRadius: 20,
+    height: 210,
+    borderRadius: 24,
     overflow: 'hidden',
     position: 'relative',
     marginBottom: 16,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   bannerImage: {
     width: '100%',
@@ -221,43 +302,66 @@ const styles = StyleSheet.create({
   },
   favBtn: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    backgroundColor: 'rgba(9, 9, 11, 0.7)',
+    top: 14,
+    right: 14,
+    backgroundColor: 'rgba(17, 17, 20, 0.75)',
     padding: 10,
     borderRadius: 20,
   },
   categoryTag: {
     position: 'absolute',
-    bottom: 12,
-    left: 12,
+    bottom: 14,
+    left: 14,
     backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   categoryText: {
     color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
   },
+  ownerNoticeBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.secondaryLight,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(108, 59, 255, 0.2)',
+  },
+  ownerNoticeText: {
+    color: COLORS.primary,
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 8,
+  },
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 18,
+    borderRadius: 24,
+    padding: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   eventName: {
-    color: COLORS.white,
-    fontSize: 20,
+    color: COLORS.textMain,
+    fontSize: 22,
     fontWeight: '800',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   metaGroup: {
-    gap: 8,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 18,
   },
   metaRow: {
     flexDirection: 'row',
@@ -266,15 +370,15 @@ const styles = StyleSheet.create({
   metaText: {
     color: COLORS.textSecondary,
     fontSize: 14,
-    marginLeft: 8,
-    fontWeight: '500',
+    marginLeft: 10,
+    fontWeight: '600',
   },
   sectionTitle: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '700',
-    marginBottom: 10,
-    marginTop: 6,
+    color: COLORS.textMain,
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 12,
+    marginTop: 8,
   },
   seatGrid: {
     flexDirection: 'row',
@@ -285,25 +389,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     padding: 10,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
   },
   seatLabel: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 11,
+    fontWeight: '600',
   },
   seatValue: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
     marginTop: 2,
   },
   descriptionText: {
     color: COLORS.textSecondary,
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 22,
   },
   sellerHeader: {
     flexDirection: 'row',
@@ -314,9 +419,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sellerName: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   ratingRow: {
     flexDirection: 'row',
@@ -327,13 +432,14 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 12,
     marginLeft: 4,
+    fontWeight: '600',
   },
   chatBtn: {
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
+    backgroundColor: COLORS.secondaryLight,
     padding: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(124, 58, 237, 0.3)',
+    borderColor: 'rgba(108, 59, 255, 0.2)',
   },
   bottomBar: {
     position: 'absolute',
@@ -348,13 +454,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 8,
   },
   bottomPriceGroup: {
     flex: 1,
   },
   priceLabel: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 11,
+    fontWeight: '600',
   },
   bottomPrice: {
     color: COLORS.success,
@@ -373,25 +485,52 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   exchangeBarBtn: {
-    backgroundColor: 'rgba(168, 85, 247, 0.15)',
-    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.secondaryLight,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(168, 85, 247, 0.3)',
+    borderColor: 'rgba(108, 59, 255, 0.2)',
+  },
+  exchangeBarBtnPending: {
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.warning,
+  },
+  exchangeBarBtnText: {
+    color: COLORS.primary,
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 6,
   },
   buyBarBtn: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 18,
+  },
+  ownerBadgeBox: {
+    backgroundColor: COLORS.secondaryLight,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(108, 59, 255, 0.2)',
+  },
+  ownerBadgeText: {
+    color: COLORS.primary,
+    fontSize: 13,
+    fontWeight: '700',
   },
   errorContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
+    backgroundColor: COLORS.background,
   },
   errorTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   errorSub: {
     color: COLORS.textSecondary,

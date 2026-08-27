@@ -1,0 +1,204 @@
+name: deploy-and-test.yml
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  BASE_URL: https://Nikhilreddy098.github.io/TicketMatchPro/
+  PYTHONUNBUFFERED: "1"
+
+jobs:
+  selenium-tests:
+    name: 🌐 Selenium — Website Tests (300)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests selenium appium-python-client pytest
+      - name: Run 300 Selenium Website E2E Test Cases
+        run: python3 automation/tests/test_selenium_website.py
+      - name: Upload Selenium Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Selenium_Website_Test_Report
+          path: |
+            Test Results/Excel/Selenium_Website_Test_Report.xlsx
+            Test Results/JSON/selenium-results.json
+
+  appium-tests:
+    name: 📱 Appium — Android Tests (300)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests selenium appium-python-client pytest
+      - name: Run 300 Appium Android Mobile Test Cases
+        run: python3 automation/tests/test_appium_android.py
+      - name: Upload Appium Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Appium_Android_Test_Report
+          path: |
+            Test Results/Excel/Appium_Android_Test_Report.xlsx
+            Test Results/JSON/appium-results.json
+
+  unit-tests:
+    name: 🧪 Unit Tests — API (300)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests
+      - name: Run 300 API & Business Logic Unit Test Cases
+        run: python3 automation/tests/test_unit_api.py
+      - name: Upload Unit Test Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Unit_API_Test_Report
+          path: |
+            Test Results/Excel/Unit_API_Test_Report.xlsx
+            Test Results/JSON/unit-results.json
+
+  validation-tests:
+    name: ✅ Validation Tests (300)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests
+      - name: Run 300 Form & Data Validation Test Cases
+        run: python3 automation/tests/test_validation.py
+      - name: Upload Validation Test Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Validation_Test_Report
+          path: |
+            Test Results/Excel/Validation_Test_Report.xlsx
+            Test Results/JSON/validation-results.json
+
+  deployment-tests:
+    name: 🚀 Deployment Status (300)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests
+      - name: Run 300 Deployment Status Verification Test Cases
+        run: python3 automation/tests/test_deployment_status.py
+      - name: Upload Deployment Status Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Deployment_Status_Test_Report
+          path: |
+            Test Results/Excel/Deployment_Status_Test_Report.xlsx
+            Test Results/JSON/deployment-results.json
+
+  load-tests:
+    name: 📈 Load Testing — Performance (300)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests
+      - name: Run 300 Performance & Load Test Cases
+        run: python3 automation/tests/test_load_performance.py
+      - name: Upload Load Testing Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Load_Testing_Performance_Report
+          path: |
+            Test Results/Excel/Load_Testing_Performance_Report.xlsx
+            Test Results/JSON/load-results.json
+
+  compile-master-report:
+    name: 📊 Compile Master Report & Deploy
+    needs: [selenium-tests, appium-tests, unit-tests, validation-tests, deployment-tests, load-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openpyxl pandas requests
+      - name: Compile Master Automation Report & HTML Dashboard
+        run: python3 automation/compile_master_report.py
+      - name: Deploy Application & HTML Reports to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./Test Results/HTML
+          keep_files: false
+      - name: Upload Master Artifacts Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Master_Automation_Reports_Package
+          path: |
+            Test Results/Excel/*.xlsx
+            Test Results/HTML/*.html
+            Test Results/JSON/*.json
+            Test Results/Summary/summary.md
+      - name: Publish GitHub Action Execution Summary
+        run: cat "Test Results/Summary/summary.md" >> $GITHUB_STEP_SUMMARY

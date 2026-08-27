@@ -24,11 +24,11 @@ export const EventCard: React.FC<EventCardProps> = ({ ticket, onPress }) => {
 
         <View style={styles.infoRow}>
           <View style={styles.infoItem}>
-            <Calendar size={13} color={COLORS.textSecondary} />
+            <Calendar size={13} color="rgba(255, 255, 255, 0.8)" />
             <Text style={styles.infoText}>{formatShortDate(ticket.event_date)}</Text>
           </View>
           <View style={[styles.infoItem, { marginLeft: 12 }]}>
-            <MapPin size={13} color={COLORS.textSecondary} />
+            <MapPin size={13} color="rgba(255, 255, 255, 0.8)" />
             <Text style={styles.infoText} numberOfLines={1}>
               {ticket.city}
             </Text>
@@ -46,15 +46,20 @@ export const EventCard: React.FC<EventCardProps> = ({ ticket, onPress }) => {
 
 const styles = StyleSheet.create({
   card: {
-    width: 260,
-    height: 170,
-    borderRadius: 16,
+    width: 270,
+    height: 180,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: COLORS.card,
     marginRight: 14,
     position: 'relative',
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   image: {
     width: '100%',
@@ -63,16 +68,16 @@ const styles = StyleSheet.create({
   },
   badgeContainer: {
     position: 'absolute',
-    top: 10,
-    left: 10,
+    top: 12,
+    left: 12,
     zIndex: 2,
-    backgroundColor: 'rgba(9, 9, 11, 0.75)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
   },
   categoryBadge: {
-    color: COLORS.secondary,
+    color: COLORS.white,
     fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -82,12 +87,12 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'rgba(9, 9, 11, 0.85)',
-    padding: 12,
+    backgroundColor: 'rgba(17, 17, 20, 0.75)',
+    padding: 14,
   },
   eventName: {
     color: COLORS.white,
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
     marginBottom: 4,
   },
@@ -101,7 +106,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoText: {
-    color: COLORS.textSecondary,
+    color: 'rgba(255, 255, 255, 0.9)',
     fontSize: 12,
     marginLeft: 4,
   },
@@ -110,13 +115,13 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   priceLabel: {
-    color: COLORS.textMuted,
+    color: 'rgba(255, 255, 255, 0.7)',
     fontSize: 11,
     marginRight: 4,
   },
   priceValue: {
-    color: COLORS.success,
-    fontSize: 15,
-    fontWeight: '700',
+    color: '#34D399',
+    fontSize: 16,
+    fontWeight: '800',
   },
 });

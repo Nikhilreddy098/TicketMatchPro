@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Modal, TouchableOpacity, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Filter, X, ArrowDownUp, Check } from 'lucide-react-native';
+import { Filter, X, ArrowDownUp, Check, MapPin } from 'lucide-react-native';
 import { useTickets } from '../../hooks/useTickets';
 import { SearchBar } from '../../components/SearchBar';
 import { TicketCard } from '../../components/TicketCard';
@@ -9,41 +9,60 @@ import { CategoryCard } from '../../components/CategoryCard';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 import { EmptyState } from '../../components/EmptyState';
-import { Loading } from '../../components/Loading';
-import { CATEGORIES, Category } from '../../constants/categories';
+import { Skeleton } from '../../components/Skeleton';
+import { LocationPickerModal } from '../../components/LocationPickerModal';
+import { CATEGORIES } from '../../constants/categories';
+import { ALL_LOCATIONS_OPTION } from '../../constants/cities';
+import { getSavedMarketplaceLocation, saveMarketplaceLocation } from '../../services/location';
 import { COLORS } from '../../constants/colors';
 
 export default function SearchScreen() {
   const router = useRouter();
   const [query, setQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [cityFilter, setCityFilter] = useState<string>('');
+  const [cityFilter, setCityFilter] = useState<string>(ALL_LOCATIONS_OPTION);
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [sortBy, setSortBy] = useState<'newest' | 'price_low' | 'price_high' | 'date'>('newest');
   const [isFilterModalVisible, setIsFilterModalVisible] = useState<boolean>(false);
+  const [isLocationModalVisible, setIsLocationModalVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const loadLocation = async () => {
+      const saved = await getSavedMarketplaceLocation();
+      setCityFilter(saved);
+    };
+    loadLocation();
+  }, []);
 
   const { tickets, loading, refetch } = useTickets({
     query,
     category_id: selectedCategory || undefined,
-    city: cityFilter || undefined,
+    city: cityFilter === ALL_LOCATIONS_OPTION ? undefined : cityFilter,
     minPrice: minPrice ? parseFloat(minPrice) : undefined,
     maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
     sortBy,
   });
+
+  const handleSelectLocation = async (cityName: string) => {
+    setCityFilter(cityName);
+    await saveMarketplaceLocation(cityName);
+    refetch();
+  };
 
   const handleApplyFilter = () => {
     setIsFilterModalVisible(false);
     refetch();
   };
 
-  const handleResetFilter = () => {
+  const handleResetFilter = async () => {
     setSelectedCategory(null);
-    setCityFilter('');
+    setCityFilter(ALL_LOCATIONS_OPTION);
     setMinPrice('');
     setMaxPrice('');
     setSortBy('newest');
     setIsFilterModalVisible(false);
+    await saveMarketplaceLocation(ALL_LOCATIONS_OPTION);
     refetch();
   };
 
@@ -60,28 +79,70 @@ export default function SearchScreen() {
           placeholder="Search event, venue, city..."
         />
 
-        {/* Results counter & Sort summary */}
+        {/* Location Trigger Chip + Category Horizontal Bar */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            style={[
+              styles.locationChip,
+              cityFilter !== ALL_LOCATIONS_OPTION ? styles.locationChipActive : null,
+            ]}
+            onPress={() => setIsLocationModalVisible(true)}
+          >
+            <MapPin size={14} color={cityFilter !== ALL_LOCATIONS_OPTION ? COLORS.white : COLORS.primary} />
+            <Text
+              style={[
+                styles.locationChipText,
+                cityFilter !== ALL_LOCATIONS_OPTION ? styles.locationChipTextActive : null,
+              ]}
+            >
+              {cityFilter === ALL_LOCATIONS_OPTION ? 'All Locations' : cityFilter}
+            </Text>
+          </TouchableOpacity>
+
+          {CATEGORIES.map((category) => (
+            <CategoryCard
+              key={category.id}
+              category={category}
+              isSelected={selectedCategory === category.id}
+              onSelect={(cat) => {
+                setSelectedCategory(selectedCategory === cat.id ? null : cat.id);
+                refetch();
+              }}
+            />
+          ))}
+        </ScrollView>
+
+        {/* Results counter & Sort trigger */}
         <View style={styles.resultsBar}>
           <Text style={styles.resultsCount}>
             {tickets.length} {tickets.length === 1 ? 'ticket' : 'tickets'} available
+            {cityFilter !== ALL_LOCATIONS_OPTION ? ` in ${cityFilter}` : ''}
           </Text>
           <TouchableOpacity
             style={styles.sortTrigger}
             onPress={() => setIsFilterModalVisible(true)}
             activeOpacity={0.8}
           >
-            <ArrowDownUp size={14} color={COLORS.secondary} />
+            <ArrowDownUp size={14} color={COLORS.primary} />
             <Text style={styles.sortTriggerText}>Sort & Filter</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {loading ? (
-        <Loading message="Searching tickets..." />
+        <View style={{ padding: 16, gap: 14 }}>
+          <Skeleton width="100%" height={160} borderRadius={20} />
+          <Skeleton width="100%" height={160} borderRadius={20} />
+        </View>
       ) : tickets.length === 0 ? (
         <EmptyState
           title="No Matching Tickets"
-          description="We couldn't find any tickets matching your search query or filters. Try adjusting your criteria."
+          description={
+            cityFilter !== ALL_LOCATIONS_OPTION
+              ? `No active tickets found matching your search in ${cityFilter}. Try selecting All Locations or adjusting filters.`
+              : "We couldn't find any tickets matching your search query or filters. Try adjusting your criteria."
+          }
           buttonTitle="Reset Search Filters"
           onButtonPress={handleResetFilter}
         />
@@ -110,12 +171,28 @@ export default function SearchScreen() {
                 <Filter size={18} color={COLORS.primary} />
                 <Text style={styles.modalTitle}>Filter & Sort Tickets</Text>
               </View>
-              <TouchableOpacity onPress={() => setIsFilterModalVisible(false)}>
-                <X size={22} color={COLORS.white} />
+              <TouchableOpacity onPress={() => setIsFilterModalVisible(false)} activeOpacity={0.7}>
+                <X size={22} color={COLORS.textMain} />
               </TouchableOpacity>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} style={styles.modalBody}>
+              {/* Location Picker Trigger in Filter Modal */}
+              <Text style={styles.filterSectionTitle}>Location / City</Text>
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.modalLocationBtn}
+                onPress={() => {
+                  setIsFilterModalVisible(false);
+                  setIsLocationModalVisible(true);
+                }}
+              >
+                <MapPin size={16} color={COLORS.primary} />
+                <Text style={styles.modalLocationBtnText}>
+                  {cityFilter === ALL_LOCATIONS_OPTION ? 'All Locations' : cityFilter}
+                </Text>
+              </TouchableOpacity>
+
               {/* Sort Options */}
               <Text style={styles.filterSectionTitle}>Sort By</Text>
               <View style={styles.sortGroup}>
@@ -129,6 +206,7 @@ export default function SearchScreen() {
                     key={option.id}
                     style={[styles.sortChip, sortBy === option.id ? styles.sortChipSelected : null]}
                     onPress={() => setSortBy(option.id as any)}
+                    activeOpacity={0.7}
                   >
                     <Text style={[styles.sortChipText, sortBy === option.id ? styles.sortChipTextSelected : null]}>
                       {option.label}
@@ -137,27 +215,6 @@ export default function SearchScreen() {
                   </TouchableOpacity>
                 ))}
               </View>
-
-              {/* Category Filter */}
-              <Text style={styles.filterSectionTitle}>Category</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
-                {CATEGORIES.map((category) => (
-                  <CategoryCard
-                    key={category.id}
-                    category={category}
-                    isSelected={selectedCategory === category.id}
-                    onSelect={(cat) => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
-                  />
-                ))}
-              </ScrollView>
-
-              {/* Location City */}
-              <Input
-                label="City / Location"
-                placeholder="e.g. Bengaluru, New Delhi, Mumbai"
-                value={cityFilter}
-                onChangeText={setCityFilter}
-              />
 
               {/* Price Range */}
               <Text style={styles.filterSectionTitle}>Price Range (₹)</Text>
@@ -188,6 +245,14 @@ export default function SearchScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Location Picker Modal */}
+      <LocationPickerModal
+        visible={isLocationModalVisible}
+        selectedCity={cityFilter}
+        onClose={() => setIsLocationModalVisible(false)}
+        onSelectCity={handleSelectLocation}
+      />
     </View>
   );
 }
@@ -201,6 +266,30 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 8,
   },
+  locationChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    marginRight: 8,
+  },
+  locationChipActive: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  locationChipText: {
+    color: COLORS.textMain,
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 6,
+  },
+  locationChipTextActive: {
+    color: COLORS.white,
+  },
   resultsBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -210,40 +299,40 @@ const styles = StyleSheet.create({
   resultsCount: {
     color: COLORS.textSecondary,
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   sortTrigger: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.card,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
   },
   sortTriggerText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     marginLeft: 6,
   },
   listContent: {
     padding: 16,
     paddingTop: 8,
-    paddingBottom: 32,
+    paddingBottom: 90,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(9, 9, 11, 0.85)',
+    backgroundColor: 'rgba(17, 17, 20, 0.4)',
     justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: COLORS.card,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     maxHeight: '85%',
-    padding: 20,
+    padding: 24,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
   },
@@ -257,20 +346,37 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   modalTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     marginLeft: 8,
   },
   modalBody: {
     marginBottom: 16,
   },
   filterSectionTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 10,
     marginTop: 6,
+  },
+  modalLocationBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    marginBottom: 16,
+  },
+  modalLocationBtnText: {
+    color: COLORS.textMain,
+    fontSize: 14,
+    fontWeight: '700',
+    marginLeft: 8,
   },
   sortGroup: {
     flexDirection: 'row',
@@ -295,7 +401,7 @@ const styles = StyleSheet.create({
   sortChipText: {
     color: COLORS.textSecondary,
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   sortChipTextSelected: {
     color: COLORS.white,
@@ -307,7 +413,7 @@ const styles = StyleSheet.create({
   modalFooter: {
     flexDirection: 'row',
     gap: 10,
-    paddingTop: 12,
+    paddingTop: 14,
     borderTopWidth: 1,
     borderTopColor: COLORS.cardBorder,
   },

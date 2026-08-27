@@ -30,12 +30,12 @@ export default function ForgotPasswordScreen() {
         <View style={styles.successBox}>
           <Text style={styles.successTitle}>Check Your Inbox! 📧</Text>
           <Text style={styles.successText}>
-            We've sent password reset instructions to <Text style={{ color: COLORS.white }}>{email}</Text>.
+            We've sent password reset instructions to <Text style={{ color: COLORS.textMain, fontWeight: '700' }}>{email}</Text>.
           </Text>
           <Button title="Back to Sign In" onPress={() => router.replace('/(auth)/login')} style={{ marginTop: 16 }} />
         </View>
       ) : (
-        <View style={styles.form}>
+        <View style={styles.formCard}>
           <Input
             label="Email Address"
             placeholder="name@example.com"
@@ -57,9 +57,9 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   title: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: '800',
     marginBottom: 8,
   },
   description: {
@@ -68,16 +68,21 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 24,
   },
-  form: {
+  formCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   successBox: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.success,

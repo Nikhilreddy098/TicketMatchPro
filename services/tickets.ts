@@ -1,6 +1,7 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { Ticket, TicketStatus } from '../types/ticket';
 import { generateUniqueId } from '../utils/helpers';
+import { ALL_LOCATIONS_OPTION } from '../constants/cities';
 
 // Rich initial seed tickets for smooth offline / demo experience
 const MOCK_TICKETS: Ticket[] = [
@@ -232,6 +233,44 @@ const MOCK_TICKETS: Ticket[] = [
     },
     is_favorite: false,
   },
+  {
+    id: 't-107',
+    seller_id: 'u-3',
+    event_name: 'Mumbai International Film Screening',
+    category_id: '33333333-3333-3333-3333-333333333333',
+    category_name: 'Movies',
+    event_date: '2026-10-02',
+    event_time: '19:30',
+    venue: 'NCPA Mumbai',
+    city: 'Mumbai',
+    ticket_type: 'VIP Pass',
+    section: 'Auditorium A',
+    row: 'R5',
+    seat: 'A-12',
+    quantity: 2,
+    original_price: 1800,
+    selling_price: 1400,
+    description: 'Exclusive red carpet screening with director Q&A session.',
+    status: 'active',
+    image_url: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800&auto=format&fit=crop&q=60',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    seller: {
+      id: 'u-3',
+      full_name: 'Vikramaditya Roy',
+      email: 'vikram@example.com',
+      avatar_url: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
+      rating: 4.7,
+      total_sales: 5,
+      total_purchases: 2,
+      total_exchanges: 1,
+      is_verified: false,
+      role: 'user',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    },
+    is_favorite: false,
+  },
 ];
 
 let localTickets: Ticket[] = [...MOCK_TICKETS];
@@ -246,6 +285,11 @@ export interface SearchTicketsFilter {
 }
 
 export const getTickets = async (filter?: SearchTicketsFilter): Promise<Ticket[]> => {
+  const isCityFilterActive =
+    filter?.city &&
+    filter.city !== ALL_LOCATIONS_OPTION &&
+    filter.city.trim().length > 0;
+
   if (isSupabaseConfigured()) {
     try {
       let query = supabase.from('tickets').select('*, seller:profiles(*)').eq('status', 'active');
@@ -253,8 +297,8 @@ export const getTickets = async (filter?: SearchTicketsFilter): Promise<Ticket[]
       if (filter?.category_id) {
         query = query.eq('category_id', filter.category_id);
       }
-      if (filter?.city) {
-        query = query.ilike('city', `%${filter.city}%`);
+      if (isCityFilterActive) {
+        query = query.ilike('city', `%${filter!.city!.trim()}%`);
       }
       if (filter?.query) {
         query = query.or(`event_name.ilike.%${filter.query}%,venue.ilike.%${filter.query}%,city.ilike.%${filter.query}%`);
@@ -277,9 +321,11 @@ export const getTickets = async (filter?: SearchTicketsFilter): Promise<Ticket[]
       }
 
       const { data, error } = await query;
-      if (!error && data) return data as Ticket[];
-    } catch (e) {
-      console.warn('Supabase fetch failed, using memory store', e);
+      if (error) throw new Error(error.message);
+      if (data && data.length > 0) return data as Ticket[];
+      if (data && data.length === 0) return [];
+    } catch (e: any) {
+      console.warn('Supabase fetch tickets failed, using local store', e);
     }
   }
 
@@ -289,8 +335,9 @@ export const getTickets = async (filter?: SearchTicketsFilter): Promise<Ticket[]
   if (filter?.category_id) {
     result = result.filter((t) => t.category_id === filter.category_id);
   }
-  if (filter?.city) {
-    result = result.filter((t) => t.city.toLowerCase().includes(filter.city!.toLowerCase()));
+  if (isCityFilterActive) {
+    const targetCity = filter!.city!.trim().toLowerCase();
+    result = result.filter((t) => t.city.toLowerCase().includes(targetCity));
   }
   if (filter?.query) {
     const q = filter.query.toLowerCase();
@@ -341,6 +388,58 @@ export const getTicketById = async (id: string): Promise<Ticket | null> => {
 export const createTicketListing = async (
   ticketData: Omit<Ticket, 'id' | 'created_at' | 'updated_at' | 'status'>
 ): Promise<Ticket> => {
+  console.log(`[TICKET CREATE] seller_id being inserted: ${ticketData.seller_id}`);
+
+  if (isSupabaseConfigured()) {
+    try {
+      const payload = {
+        seller_id: ticketData.seller_id,
+        event_name: ticketData.event_name,
+        category_id: ticketData.category_id,
+        event_date: ticketData.event_date,
+        event_time: ticketData.event_time,
+        venue: ticketData.venue,
+        city: ticketData.city,
+        ticket_type: ticketData.ticket_type,
+        section: ticketData.section,
+        row: ticketData.row,
+        seat: ticketData.seat,
+        quantity: ticketData.quantity,
+        original_price: ticketData.original_price,
+        selling_price: ticketData.selling_price,
+        description: ticketData.description,
+        status: 'active',
+        image_url: ticketData.image_url,
+      };
+
+      const { data, error } = await supabase
+        .from('tickets')
+        .insert(payload)
+        .select('*, seller:profiles(*)')
+        .single();
+
+      if (error) {
+        console.error('[TICKET CREATE ERROR]', error.message);
+        throw new Error(error.message);
+      }
+
+      if (data) {
+        const created = data as Ticket;
+        console.log(`[TICKET CREATE SUCCESS] inserted ticket ID: ${created.id}, seller_id: ${created.seller_id}`);
+        const existingIdx = localTickets.findIndex((t) => t.id === created.id);
+        if (existingIdx === -1) {
+          localTickets.unshift(created);
+        } else {
+          localTickets[existingIdx] = created;
+        }
+        return created;
+      }
+    } catch (e: any) {
+      console.error('[TICKET CREATE EXCEPTION]', e?.message);
+      throw new Error(e?.message || 'Database ticket listing creation failed.');
+    }
+  }
+
   const newTicket: Ticket = {
     ...ticketData,
     id: generateUniqueId('ticket'),
@@ -348,15 +447,6 @@ export const createTicketListing = async (
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
-
-  if (isSupabaseConfigured()) {
-    try {
-      const { data, error } = await supabase.from('tickets').insert(newTicket).select().single();
-      if (!error && data) return data as Ticket;
-    } catch (e) {
-      console.warn('Supabase create ticket failed, fallback to memory store');
-    }
-  }
 
   localTickets.unshift(newTicket);
   return newTicket;
@@ -381,13 +471,31 @@ export const updateTicketStatus = async (id: string, status: TicketStatus): Prom
 };
 
 export const getUserListings = async (userId: string): Promise<Ticket[]> => {
+  if (!userId) return [];
+  console.log(`[MY LISTINGS] querying seller_id: ${userId}`);
+
   if (isSupabaseConfigured()) {
     try {
-      const { data, error } = await supabase.from('tickets').select('*').eq('seller_id', userId);
-      if (!error && data) return data as Ticket[];
-    } catch (e) {}
+      const { data, error } = await supabase
+        .from('tickets')
+        .select('*, seller:profiles(*)')
+        .eq('seller_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('[MY LISTINGS FETCH ERROR]', error.message);
+      } else if (data) {
+        console.log(`[MY LISTINGS FETCH SUCCESS] retrieved ${data.length} listings from Supabase for seller_id: ${userId}`);
+        return data as Ticket[];
+      }
+    } catch (e: any) {
+      console.warn('[MY LISTINGS EXCEPTION]', e?.message);
+    }
   }
-  return localTickets.filter((t) => t.seller_id === userId);
+
+  const localMatches = localTickets.filter((t) => t.seller_id === userId);
+  console.log(`[MY LISTINGS LOCAL FALLBACK] retrieved ${localMatches.length} listings for seller_id: ${userId}`);
+  return localMatches;
 };
 
 export const deleteTicketAdmin = async (ticketId: string): Promise<boolean> => {
@@ -406,4 +514,3 @@ export const deleteTicketAdmin = async (ticketId: string): Promise<boolean> => {
   localTickets = localTickets.filter((t) => t.id !== ticketId);
   return true;
 };
-

@@ -1,8 +1,19 @@
-import React from 'react';
-import { Stack } from 'expo-router';
+import React, { useEffect } from 'react';
+import { Stack, useRouter } from 'expo-router';
+import { useAuth } from '../../hooks/useAuth';
 import { COLORS } from '../../constants/colors';
 
 export default function AuthLayout() {
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!isLoading && user) {
+      console.log('[AUTH LAYOUT GUARD] Logged in user accessed auth screen -> NAVIGATING TO HOME');
+      router.replace('/(tabs)/home');
+    }
+  }, [user, isLoading, router]);
+
   return (
     <Stack
       screenOptions={{

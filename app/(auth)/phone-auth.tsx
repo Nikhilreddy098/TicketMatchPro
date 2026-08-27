@@ -74,13 +74,13 @@ export default function PhoneAuthScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-      <TouchableOpacity onPress={() => (step === 'otp' ? setStep('phone') : router.back())} style={styles.backBtn}>
-        <ArrowLeft size={24} color={COLORS.white} />
+      <TouchableOpacity onPress={() => (step === 'otp' ? setStep('phone') : router.back())} style={styles.backBtn} activeOpacity={0.7}>
+        <ArrowLeft size={20} color={COLORS.textMain} />
       </TouchableOpacity>
 
       <View style={styles.header}>
         <View style={styles.logoCircle}>
-          <Phone size={36} color={COLORS.primary} />
+          <Phone size={32} color={COLORS.primary} />
         </View>
         <Text style={styles.title}>Phone Authentication</Text>
         <Text style={styles.subtitle}>
@@ -90,7 +90,7 @@ export default function PhoneAuthScreen() {
         </Text>
       </View>
 
-      <View style={styles.formContainer}>
+      <View style={styles.formCard}>
         {step === 'phone' ? (
           <>
             <Input
@@ -163,23 +163,25 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 28,
     marginTop: 40,
   },
   logoCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
+    width: 64,
+    height: 64,
+    borderRadius: 20,
+    backgroundColor: COLORS.secondaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   title: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 24,
     fontWeight: '800',
   },
@@ -190,12 +192,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: 16,
   },
-  formContainer: {
+  formCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   countryCode: {
     color: COLORS.primary,

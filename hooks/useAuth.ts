@@ -6,18 +6,18 @@ interface AuthContextType {
   user: UserProfile | null;
   isLoading: boolean;
   login: (email: string, pass: string) => Promise<{ user: UserProfile | null; error?: string }>;
-  register: (name: string, email: string, pass: string) => Promise<{ user: UserProfile | null; error?: string }>;
+  register: (name: string, email: string, pass: string) => Promise<{ user: UserProfile | null; error?: string; needsEmailConfirmation?: boolean }>;
   logout: () => Promise<void>;
   isAdmin: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  user: DEMO_USER,
-  isLoading: false,
-  login: async () => ({ user: DEMO_USER }),
-  register: async () => ({ user: DEMO_USER }),
+  user: null,
+  isLoading: true,
+  login: async () => ({ user: null }),
+  register: async () => ({ user: null }),
   logout: async () => {},
-  isAdmin: true,
+  isAdmin: false,
 });
 
 export const useAuth = () => useContext(AuthContext);

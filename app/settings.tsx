@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Bell, Moon, Lock, HelpCircle, FileText, Trash2, LogOut, ChevronRight } from 'lucide-react-native';
+import { Bell, Lock, HelpCircle, FileText, Trash2, ChevronRight, Globe, Shield, Info } from 'lucide-react-native';
 import { useAuth } from '../hooks/useAuth';
 import { COLORS } from '../constants/colors';
 
@@ -9,7 +9,6 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { logout } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState<boolean>(true);
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -31,14 +30,14 @@ export default function SettingsScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContent}>
-      <Text style={styles.sectionHeader}>Preferences</Text>
+      <Text style={styles.sectionHeader}>Account</Text>
       <View style={styles.card}>
         <View style={styles.settingRow}>
           <View style={styles.iconCircle}>
             <Bell size={18} color={COLORS.primary} />
           </View>
           <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.settingTitle}>Push Notifications</Text>
+            <Text style={styles.settingTitle}>Notifications</Text>
             <Text style={styles.settingSub}>Alerts for exchanges, purchases, and messages</Text>
           </View>
           <Switch
@@ -51,24 +50,39 @@ export default function SettingsScreen() {
 
         <View style={styles.divider} />
 
-        <View style={styles.settingRow}>
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => Alert.alert('Privacy', 'Your profile and data are secured with end-to-end Supabase encryption.')}
+        >
           <View style={styles.iconCircle}>
-            <Moon size={18} color={COLORS.secondary} />
+            <Lock size={18} color={COLORS.primary} />
           </View>
           <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.settingTitle}>Dark Theme Always</Text>
-            <Text style={styles.settingSub}>Optimized for high contrast dark aesthetic</Text>
+            <Text style={styles.settingTitle}>Privacy & Security</Text>
+            <Text style={styles.settingSub}>Manage profile visibility and password</Text>
           </View>
-          <Switch
-            value={darkModeEnabled}
-            onValueChange={setDarkModeEnabled}
-            trackColor={{ false: COLORS.cardBorder, true: COLORS.primary }}
-            thumbColor={COLORS.white}
-          />
-        </View>
+          <ChevronRight size={16} color={COLORS.textMuted} />
+        </TouchableOpacity>
       </View>
 
-      <Text style={styles.sectionHeader}>Support & Legal</Text>
+      <Text style={styles.sectionHeader}>App</Text>
+      <View style={styles.card}>
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => Alert.alert('Language', 'Current language: English (India)')}
+        >
+          <View style={styles.iconCircle}>
+            <Globe size={18} color={COLORS.secondary} />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={styles.settingTitle}>Language</Text>
+            <Text style={styles.settingSub}>English (IN)</Text>
+          </View>
+          <ChevronRight size={16} color={COLORS.textMuted} />
+        </TouchableOpacity>
+      </View>
+
+      <Text style={styles.sectionHeader}>Support</Text>
       <View style={styles.card}>
         <TouchableOpacity
           style={styles.settingRow}
@@ -77,7 +91,7 @@ export default function SettingsScreen() {
           <View style={styles.iconCircle}>
             <HelpCircle size={18} color={COLORS.success} />
           </View>
-          <Text style={[styles.settingTitle, { flex: 1, marginLeft: 12 }]}>Help & Support</Text>
+          <Text style={[styles.settingTitle, { flex: 1, marginLeft: 12 }]}>Help Center</Text>
           <ChevronRight size={16} color={COLORS.textMuted} />
         </TouchableOpacity>
 
@@ -93,12 +107,25 @@ export default function SettingsScreen() {
           <Text style={[styles.settingTitle, { flex: 1, marginLeft: 12 }]}>Terms & Privacy Policy</Text>
           <ChevronRight size={16} color={COLORS.textMuted} />
         </TouchableOpacity>
+
+        <View style={styles.divider} />
+
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => Alert.alert('About TicketMatchPro', 'TicketMatchPro v1.0.0 — Peer-to-Peer Ticket Marketplace')}
+        >
+          <View style={styles.iconCircle}>
+            <Info size={18} color={COLORS.primary} />
+          </View>
+          <Text style={[styles.settingTitle, { flex: 1, marginLeft: 12 }]}>About TicketMatchPro</Text>
+          <ChevronRight size={16} color={COLORS.textMuted} />
+        </TouchableOpacity>
       </View>
 
       <Text style={styles.sectionHeader}>Danger Zone</Text>
       <View style={styles.card}>
         <TouchableOpacity style={styles.settingRow} onPress={handleDeleteAccount}>
-          <View style={[styles.iconCircle, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
+          <View style={[styles.iconCircle, { backgroundColor: COLORS.errorBg }]}>
             <Trash2 size={18} color={COLORS.error} />
           </View>
           <Text style={[styles.settingTitle, { color: COLORS.error, flex: 1, marginLeft: 12 }]}>
@@ -122,7 +149,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: COLORS.textMuted,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
     textTransform: 'uppercase',
     marginBottom: 8,
     marginLeft: 4,
@@ -130,11 +157,16 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 14,
+    borderRadius: 24,
+    padding: 16,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   settingRow: {
     flexDirection: 'row',
@@ -142,20 +174,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   iconCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     backgroundColor: COLORS.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
   settingTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   settingSub: {
-    color: COLORS.textMuted,
+    color: COLORS.textSecondary,
     fontSize: 11,
     marginTop: 2,
   },

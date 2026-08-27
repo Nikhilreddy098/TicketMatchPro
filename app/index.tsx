@@ -10,10 +10,13 @@ export default function Index() {
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
+    console.log('[INDEX ROUTE CHECK] isLoading:', isLoading, 'user:', user?.id || 'NO USER');
     if (!isLoading) {
       if (user) {
+        console.log('NAVIGATING TO HOME');
         router.replace('/(tabs)/home');
       } else {
+        console.log('NAVIGATING TO LOGIN');
         router.replace('/(auth)/login');
       }
     }

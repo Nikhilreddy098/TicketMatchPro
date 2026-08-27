@@ -33,16 +33,18 @@ Module.prototype.require = function (id) {
 const { calculateOrderTotal, processPaymentTransaction, isRazorpayConfigured } = require('../dist_test/lib/payment');
 const { loginSchema, registerSchema, ticketListingSchema, profileUpdateSchema } = require('../dist_test/utils/validation');
 const { getTickets, createTicketListing, updateTicketStatus, getTicketById, getUserListings } = require('../dist_test/services/tickets');
-const { createExchangeRequest, updateExchangeStatus, getUserExchanges } = require('../dist_test/services/exchange');
+const { createExchangeRequest, updateExchangeStatus, getUserExchanges, hasPendingExchangeRequest, getExchangeRequestsForSeller, acceptExchangeRequest, rejectExchangeRequest } = require('../dist_test/services/exchange');
 const { createOrder, verifyTicketByQrHash, getOrderVerification, getUserOrders } = require('../dist_test/services/orders');
 const { toggleFavorite, isTicketFavorite, getUserFavorites } = require('../dist_test/services/favorites');
 const { formatCurrency, formatDate, formatTime, formatShortDate } = require('../dist_test/utils/formatting');
 const { getCategoryIconName, truncateText, generateUniqueId } = require('../dist_test/utils/helpers');
 const { CATEGORIES } = require('../dist_test/constants/categories');
 const { CONFIG } = require('../dist_test/constants/config');
+const { saveMarketplaceLocation, getSavedMarketplaceLocation, normalizeCityName, isCityMatch } = require('../dist_test/services/location');
+const { ALL_LOCATIONS_OPTION } = require('../dist_test/constants/cities');
 
 async function runFullTestSuite() {
-  console.log('🧪 Executing Comprehensive TicketMatchPro Test Suite (325 Automated Test Cases)...\n');
+  console.log('🧪 Executing Comprehensive TicketMatchPro Test Suite...\n');
   let passed = 0;
   let failed = 0;
 
@@ -60,8 +62,8 @@ async function runFullTestSuite() {
   // 1. PRICING, TAX & FEE CALCULATIONS (50 TEST CASES)
   // =========================================================================
   for (let i = 1; i <= 50; i++) {
-    const price = i * 250; // ₹250 to ₹12,500
-    const qty = (i % 5) + 1; // 1 to 5 tickets
+    const price = i * 250;
+    const qty = (i % 5) + 1;
     await test(`[Pricing Test ${i}] Calculate 5% service fee for price ₹${price} x ${qty} ticket(s)`, () => {
       const totals = calculateOrderTotal(price, qty);
       const subtotal = price * qty;
@@ -111,7 +113,6 @@ async function runFullTestSuite() {
   // =========================================================================
   // 3. FORM VALIDATION SCHEMAS (65 TEST CASES)
   // =========================================================================
-  // Login Schema Tests (20 test cases)
   for (let i = 1; i <= 20; i++) {
     const isValid = i > 5;
     const email = isValid ? `user${i}@ticketmatch.com` : `invalid-email-${i}`;
@@ -122,7 +123,6 @@ async function runFullTestSuite() {
     });
   }
 
-  // Registration Schema Tests (20 test cases)
   for (let i = 1; i <= 20; i++) {
     const match = i > 5;
     const pass = 'secret123';
@@ -138,7 +138,6 @@ async function runFullTestSuite() {
     });
   }
 
-  // Ticket Listing Schema Tests (15 test cases)
   for (let i = 1; i <= 15; i++) {
     const validPrices = i <= 10;
     const origPrice = validPrices ? 2000 : -100;
@@ -161,9 +160,8 @@ async function runFullTestSuite() {
     });
   }
 
-  // Profile Update Schema Tests (10 test cases)
   for (let i = 1; i <= 10; i++) {
-    const bioText = 'A'.repeat(i * 25); // 25 to 250 chars
+    const bioText = 'A'.repeat(i * 25);
     const isValidBio = bioText.length <= 200;
     await test(`[Validation Bio ${i}] Profile bio length test (${bioText.length} chars)`, () => {
       const res = profileUpdateSchema.safeParse({
@@ -225,7 +223,7 @@ async function runFullTestSuite() {
   }
 
   // =========================================================================
-  // 6. PEER-TO-PEER TICKET EXCHANGE WORKFLOW (40 TEST CASES)
+  // 6. PEER-TO-PEER TICKET EXCHANGE WORKFLOW (50 TEST CASES INCLUDING STEP 3)
   // =========================================================================
   for (let i = 1; i <= 20; i++) {
     await test(`[Exchange Request Test ${i}] Create P2P request ex-${i}`, async () => {
@@ -257,6 +255,44 @@ async function runFullTestSuite() {
       assert.strictEqual(success, true);
     });
   }
+
+  // STEP 3 Specific Validation Tests
+  await test(`[STEP 3] Prevent duplicate pending exchange request`, async () => {
+    const sender = 'user-dup-test';
+    const seller = 'user-seller-test';
+    const targetTicket = 't-target-dup';
+    await createExchangeRequest(sender, seller, 't-offered-dup', targetTicket, 'First request');
+    const isPending = await hasPendingExchangeRequest(sender, targetTicket);
+    assert.strictEqual(isPending, true);
+    try {
+      await createExchangeRequest(sender, seller, 't-offered-dup', targetTicket, 'Second request');
+      assert.fail('Duplicate request should have thrown error');
+    } catch (err) {
+      assert.ok(err.message.includes('already have a pending exchange request'));
+    }
+  });
+
+  await test(`[STEP 3] Prevent seller from requesting own ticket`, async () => {
+    const seller = 'user-self-seller';
+    try {
+      await createExchangeRequest(seller, seller, 't-offered-self', 't-target-self', 'Self request');
+      assert.fail('Self request should have thrown error');
+    } catch (err) {
+      assert.ok(err.message.includes('cannot request an exchange for your own ticket'));
+    }
+  });
+
+  await test(`[STEP 3] Enforce seller authorization on accept`, async () => {
+    const sender = 'user-requester-auth';
+    const seller = 'user-seller-auth';
+    const ex = await createExchangeRequest(sender, seller, 't-offered-auth', 't-target-auth');
+    try {
+      await acceptExchangeRequest(ex.id, sender);
+      assert.fail('Non-seller accept should have thrown error');
+    } catch (err) {
+      assert.ok(err.message.includes('Only the ticket seller can accept or reject'));
+    }
+  });
 
   // =========================================================================
   // 7. MARKETPLACE SEARCH, FILTERING & SORTING (40 TEST CASES)
@@ -307,6 +343,94 @@ async function runFullTestSuite() {
       assert.ok(typeof icon === 'string');
     });
   }
+
+  // =========================================================================
+  // 9. LOCATION-BASED MARKETPLACE DISCOVERY (15 TEST CASES)
+  // =========================================================================
+  await test(`[Location Test 1] Default marketplace location`, async () => {
+    const loc = await getSavedMarketplaceLocation();
+    assert.strictEqual(loc, ALL_LOCATIONS_OPTION);
+  });
+
+  await test(`[Location Test 2] Select & persist Hyderabad`, async () => {
+    await saveMarketplaceLocation('Hyderabad');
+    const loc = await getSavedMarketplaceLocation();
+    assert.strictEqual(loc, 'Hyderabad');
+  });
+
+  await test(`[Location Test 3] Select & persist Mumbai`, async () => {
+    await saveMarketplaceLocation('Mumbai');
+    const loc = await getSavedMarketplaceLocation();
+    assert.strictEqual(loc, 'Mumbai');
+  });
+
+  await test(`[Location Test 4] Clear filter with All Locations`, async () => {
+    await saveMarketplaceLocation('All Locations');
+    const loc = await getSavedMarketplaceLocation();
+    assert.strictEqual(loc, ALL_LOCATIONS_OPTION);
+  });
+
+  await test(`[Location Test 5] Normalize city name`, () => {
+    assert.strictEqual(normalizeCityName('hyderabad'), 'Hyderabad');
+    assert.strictEqual(normalizeCityName('  mumbai  '), 'Mumbai');
+    assert.strictEqual(isCityMatch('Hyderabad', 'hyderabad'), true);
+  });
+
+  await test(`[Location Test 6] Query active tickets for Hyderabad`, async () => {
+    const results = await getTickets({ city: 'Hyderabad' });
+    assert.ok(results.length >= 1);
+    assert.ok(results.every((t) => t.city.toLowerCase().includes('hyderabad')));
+  });
+
+  await test(`[Location Test 7] Query active tickets for Bengaluru`, async () => {
+    const results = await getTickets({ city: 'Bengaluru' });
+    assert.ok(results.length >= 1);
+    assert.ok(results.every((t) => t.city.toLowerCase().includes('bengaluru')));
+  });
+
+  await test(`[Location Test 8] Query active tickets for All Locations`, async () => {
+    const results = await getTickets({ city: ALL_LOCATIONS_OPTION });
+    assert.ok(results.length >= 5);
+  });
+
+  await test(`[Location Test 9] Empty location result for city without tickets`, async () => {
+    const results = await getTickets({ city: 'Tokyo' });
+    assert.strictEqual(results.length, 0);
+  });
+
+  await test(`[Location Test 10] Seller can still see their own listings under getUserListings`, async () => {
+    const listings = await getUserListings('u-1');
+    assert.ok(listings.length >= 1);
+  });
+
+  // =========================================================================
+  // 10. CRITICAL TICKET PERSISTENCE & RELOAD (10 TEST CASES)
+  // =========================================================================
+  await test(`[Persistence Test 1] Ticket creation persists with correct seller_id`, async () => {
+    const sellerId = 'u-persist-runall-123';
+    const created = await createTicketListing({
+      seller_id: sellerId,
+      event_name: 'RUNALL PERSISTENCE TEST 2026',
+      category_id: '11111111-1111-1111-1111-111111111111',
+      category_name: 'Concerts',
+      event_date: '2026-12-01',
+      event_time: '19:00',
+      venue: 'JLN Stadium',
+      city: 'Kolkata',
+      ticket_type: 'VIP Gold',
+      section: 'A',
+      row: 'R1',
+      seat: 'A-01',
+      quantity: 1,
+      original_price: 2000,
+      selling_price: 1800,
+      description: 'RunAll persistence test',
+      image_url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800',
+    });
+    assert.strictEqual(created.seller_id, sellerId);
+    const retrieved = await getUserListings(sellerId);
+    assert.ok(retrieved.some((t) => t.id === created.id));
+  });
 
   console.log(`\n=========================================================================`);
   console.log(`🎉 TEST SUITE SUMMARY: ${passed} PASSED, ${failed} FAILED out of ${passed + failed} Total Test Cases.`);

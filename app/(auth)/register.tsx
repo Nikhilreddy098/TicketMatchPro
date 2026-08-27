@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { User, Mail, Lock, ShieldCheck } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
@@ -32,7 +32,18 @@ export default function RegisterScreen() {
     const res = await register(fullName, email, password);
     if (res.error) {
       Alert.alert('Registration Error', res.error);
-    } else {
+    } else if (res.needsEmailConfirmation) {
+      Alert.alert(
+        'Verify Email Address ✉️',
+        `Account created successfully! A confirmation email has been sent to ${email.trim()}. Please click the link in your email to activate your account and log in.`,
+        [
+          {
+            text: 'Go to Sign In',
+            onPress: () => router.replace('/(auth)/login'),
+          },
+        ]
+      );
+    } else if (res.user) {
       router.replace('/(tabs)/home');
     }
   };
@@ -40,11 +51,12 @@ export default function RegisterScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
-        <Text style={styles.title}>Create Account</Text>
+        <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="contain" />
+        <Text style={styles.title}>Create your TicketMatchPro account</Text>
         <Text style={styles.subtitle}>Join thousands of verified ticket buyers & sellers</Text>
       </View>
 
-      <View style={styles.formContainer}>
+      <View style={styles.formCard}>
         <Input
           label="Full Name"
           placeholder="Rahul Sharma"
@@ -85,7 +97,7 @@ export default function RegisterScreen() {
           leftIcon={<ShieldCheck size={18} color={COLORS.textSecondary} />}
         />
 
-        <Button title="Register Account" onPress={handleRegister} loading={isLoading} size="large" style={styles.registerBtn} />
+        <Button title="Create Account" onPress={handleRegister} loading={isLoading} size="large" style={styles.registerBtn} />
       </View>
 
       <View style={styles.footer}>
@@ -106,24 +118,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   header: {
+    alignItems: 'center',
     marginBottom: 24,
   },
+  logoImage: {
+    width: 56,
+    height: 56,
+    borderRadius: 14,
+    marginBottom: 12,
+  },
   title: {
-    color: COLORS.white,
-    fontSize: 28,
+    color: COLORS.textMain,
+    fontSize: 22,
     fontWeight: '800',
+    textAlign: 'center',
   },
   subtitle: {
     color: COLORS.textSecondary,
     fontSize: 14,
     marginTop: 4,
+    textAlign: 'center',
   },
-  formContainer: {
+  formCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
+    borderRadius: 24,
     padding: 20,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   registerBtn: {
     marginTop: 8,

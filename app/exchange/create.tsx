@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ArrowRightLeft, CheckCircle2 } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { getTicketById, getUserListings } from '../../services/tickets';
-import { createExchangeRequest } from '../../services/exchange';
+import { createExchangeRequest, hasPendingExchangeRequest } from '../../services/exchange';
 import { Ticket } from '../../types/ticket';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
@@ -26,9 +26,37 @@ export default function CreateExchangeScreen() {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!user || !targetTicketId) return;
+      if (!user || !targetTicketId) {
+        setLoading(false);
+        return;
+      }
       try {
         const target = await getTicketById(targetTicketId);
+        if (!target) {
+          Alert.alert('Error', 'Requested ticket listing could not be found.');
+          router.back();
+          return;
+        }
+
+        if (target.seller_id === user.id) {
+          Alert.alert('Notice', 'You cannot request an exchange for your own ticket.');
+          router.back();
+          return;
+        }
+
+        const isDuplicate = await hasPendingExchangeRequest(user.id, target.id);
+        if (isDuplicate) {
+          Alert.alert(
+            'Pending Request Exists',
+            'You already have a pending exchange request for this ticket.',
+            [
+              { text: 'View My Requests', onPress: () => router.replace('/exchange') },
+              { text: 'Cancel', style: 'cancel', onPress: () => router.back() },
+            ]
+          );
+          return;
+        }
+
         setRequestedTicket(target);
 
         const mine = await getUserListings(user.id);
@@ -47,7 +75,12 @@ export default function CreateExchangeScreen() {
   }, [targetTicketId, user]);
 
   const handleSubmitExchange = async () => {
-    if (!user || !requestedTicket) return;
+    if (!user) {
+      Alert.alert('Authentication Required', 'Please sign in to propose an exchange.');
+      return;
+    }
+    if (!requestedTicket) return;
+
     if (!selectedOfferedTicket) {
       Alert.alert(
         'No Ticket Selected',
@@ -70,11 +103,11 @@ export default function CreateExchangeScreen() {
         message
       );
 
-      Alert.alert('Exchange Request Sent! 🔄', 'The ticket owner will be notified to accept or decline.', [
-        { text: 'View Exchanges', onPress: () => router.replace('/exchange') },
+      Alert.alert('Exchange Request Sent! 🔄', 'Your exchange request has been sent to the ticket owner.', [
+        { text: 'View Exchange Requests', onPress: () => router.replace('/exchange') },
       ]);
     } catch (e: any) {
-      Alert.alert('Error', e?.message || 'Failed to submit exchange request.');
+      Alert.alert('Request Failed', e?.message || 'Failed to submit exchange request.');
     } finally {
       setSubmitting(false);
     }
@@ -83,9 +116,9 @@ export default function CreateExchangeScreen() {
   if (loading) return <Loading message="Loading exchange details..." />;
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>Propose Ticket Exchange</Text>
-      <Text style={styles.subtitle}>Swap one of your tickets for the event below seamlessly.</Text>
+      <Text style={styles.subtitle}>Swap one of your active ticket listings for the ticket below.</Text>
 
       {/* Target Requested Ticket Summary */}
       {requestedTicket && (
@@ -174,34 +207,39 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   title: {
-    color: COLORS.white,
-    fontSize: 22,
+    color: COLORS.textMain,
+    fontSize: 24,
     fontWeight: '800',
   },
   subtitle: {
     color: COLORS.textSecondary,
-    fontSize: 13,
+    fontSize: 14,
     marginTop: 4,
     marginBottom: 16,
   },
   targetCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 24,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.primary,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   cardLabel: {
     color: COLORS.primary,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
     textTransform: 'uppercase',
     marginBottom: 4,
   },
   eventTitle: {
-    color: COLORS.white,
-    fontSize: 17,
-    fontWeight: '700',
+    color: COLORS.textMain,
+    fontSize: 18,
+    fontWeight: '800',
   },
   eventSub: {
     color: COLORS.textSecondary,
@@ -210,36 +248,41 @@ const styles = StyleSheet.create({
   },
   eventPrice: {
     color: COLORS.success,
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
     marginTop: 8,
   },
   arrowContainer: {
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: 14,
   },
   arrowCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: COLORS.secondaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(124, 58, 237, 0.3)',
+    borderColor: 'rgba(108, 59, 255, 0.2)',
   },
   card: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 24,
+    padding: 18,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   sectionHeader: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '700',
+    color: COLORS.textMain,
+    fontSize: 16,
+    fontWeight: '800',
     marginBottom: 12,
   },
   noTicketsBox: {
@@ -247,13 +290,13 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   noTicketsTitle: {
-    color: COLORS.white,
-    fontSize: 14,
-    fontWeight: '600',
+    color: COLORS.textMain,
+    fontSize: 15,
+    fontWeight: '700',
   },
   noTicketsSub: {
     color: COLORS.textSecondary,
-    fontSize: 12,
+    fontSize: 13,
     textAlign: 'center',
     marginTop: 4,
   },
@@ -261,20 +304,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.background,
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: 14,
+    padding: 14,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     marginBottom: 8,
   },
   ticketOptionSelected: {
     borderColor: COLORS.primary,
-    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+    backgroundColor: COLORS.secondaryLight,
   },
   ticketOptionName: {
-    color: COLORS.white,
-    fontSize: 14,
-    fontWeight: '600',
+    color: COLORS.textMain,
+    fontSize: 15,
+    fontWeight: '700',
   },
   ticketOptionSub: {
     color: COLORS.textSecondary,

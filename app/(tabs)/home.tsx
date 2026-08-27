@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowRight, Sparkles, Shield, QrCode } from 'lucide-react-native';
+import { Sparkles, Shield, QrCode, Ticket as TicketIcon, MapPin, ChevronDown } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { useTickets } from '../../hooks/useTickets';
 import { CATEGORIES, Category } from '../../constants/categories';
@@ -12,14 +12,52 @@ import { TicketCard } from '../../components/TicketCard';
 import { SearchBar } from '../../components/SearchBar';
 import { Avatar } from '../../components/Avatar';
 import { NotificationBadge } from '../../components/NotificationBadge';
+import { Loading } from '../../components/Loading';
+import { SectionHeader } from '../../components/SectionHeader';
+import { Skeleton } from '../../components/Skeleton';
+import { LocationPickerModal } from '../../components/LocationPickerModal';
+import { ALL_LOCATIONS_OPTION } from '../../constants/cities';
+import { getSavedMarketplaceLocation, saveMarketplaceLocation } from '../../services/location';
 import { COLORS } from '../../constants/colors';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { user, isAdmin } = useAuth();
+  const { user, isLoading, isAdmin } = useAuth();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { tickets, loading, refetch } = useTickets();
+  const [selectedLocation, setSelectedLocation] = useState<string>(ALL_LOCATIONS_OPTION);
+  const [isLocationModalVisible, setIsLocationModalVisible] = useState<boolean>(false);
+
+  // Load saved location from storage on mount
+  useEffect(() => {
+    const loadLocation = async () => {
+      const saved = await getSavedMarketplaceLocation();
+      setSelectedLocation(saved);
+    };
+    loadLocation();
+  }, []);
+
+  const { tickets, loading, refetch } = useTickets({
+    city: selectedLocation === ALL_LOCATIONS_OPTION ? undefined : selectedLocation,
+    category_id: selectedCategory || undefined,
+    query: searchQuery || undefined,
+  });
+
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch, selectedLocation])
+  );
+
+  const handleSelectLocation = async (cityName: string) => {
+    setSelectedLocation(cityName);
+    await saveMarketplaceLocation(cityName);
+    refetch();
+  };
+
+  if (!user && !isLoading) {
+    return <Loading message="Authenticating..." fullScreen />;
+  }
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -36,20 +74,12 @@ export default function HomeScreen() {
     }
   };
 
-  const filteredTickets = tickets.filter((t) => {
-    if (selectedCategory && t.category_id !== selectedCategory) return false;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      return (
-        t.event_name.toLowerCase().includes(q) ||
-        t.venue.toLowerCase().includes(q) ||
-        t.city.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
-
   const featuredTickets = tickets.slice(0, 4);
+
+  const dynamicSectionTitle =
+    selectedLocation === ALL_LOCATIONS_OPTION
+      ? 'All available tickets'
+      : `Tickets in ${selectedLocation}`;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -61,9 +91,9 @@ export default function HomeScreen() {
         {/* Top Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.push('/(tabs)/profile')} activeOpacity={0.8} style={styles.userRow}>
-            <Avatar url={user?.avatar_url} name={user?.full_name} size={42} isVerified={user?.is_verified} />
+            <Avatar url={user?.avatar_url} name={user?.full_name} size={44} isVerified={user?.is_verified} />
             <View style={styles.greetingTextContainer}>
-              <Text style={styles.greeting}>{getGreeting()},</Text>
+              <Text style={styles.greeting}>{getGreeting()} 👋</Text>
               <Text style={styles.userName}>{user?.full_name || 'Guest User'}</Text>
             </View>
           </TouchableOpacity>
@@ -75,29 +105,46 @@ export default function HomeScreen() {
                 style={styles.adminBadge}
                 activeOpacity={0.8}
               >
-                <Shield size={16} color={COLORS.secondary} />
+                <Shield size={14} color={COLORS.primary} />
                 <Text style={styles.adminText}>Admin</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity onPress={() => router.push('/verify-ticket')} style={styles.verifyBtn} activeOpacity={0.8}>
-              <QrCode size={20} color={COLORS.white} />
+              <QrCode size={18} color={COLORS.textMain} />
             </TouchableOpacity>
             <NotificationBadge count={2} onPress={() => router.push('/notifications')} />
           </View>
         </View>
 
-        {/* Search Bar */}
-        <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          onFilterPress={() => router.push('/(tabs)/search')}
-          placeholder="Search concerts, sports, festivals..."
-        />
+        {/* Location Picker Header Trigger Badge */}
+        <TouchableOpacity
+          activeOpacity={0.8}
+          style={styles.locationSelectorBadge}
+          onPress={() => setIsLocationModalVisible(true)}
+        >
+          <MapPin size={16} color={COLORS.primary} />
+          <Text style={styles.locationSelectorText}>
+            {selectedLocation === ALL_LOCATIONS_OPTION ? 'All Locations' : selectedLocation}
+          </Text>
+          <ChevronDown size={14} color={COLORS.textSecondary} />
+        </TouchableOpacity>
+
+        {/* Hero Title & Search Bar */}
+        <View style={styles.heroSection}>
+          <Text style={styles.heroTitle}>Find your next experience</Text>
+          <SearchBar
+            value={searchQuery}
+            onChangeText={(text) => {
+              setSearchQuery(text);
+              refetch();
+            }}
+            onFilterPress={() => router.push('/(tabs)/search')}
+            placeholder="Search events, artists, venues..."
+          />
+        </View>
 
         {/* Categories Horizontal Scroll */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-        </View>
+        <SectionHeader title="Categories" />
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
           {CATEGORIES.map((category) => (
@@ -111,37 +158,66 @@ export default function HomeScreen() {
         </ScrollView>
 
         {/* Featured Events Horizontal Carousel */}
-        <View style={styles.sectionHeader}>
-          <View style={styles.sectionTitleRow}>
-            <Sparkles size={16} color={COLORS.secondary} />
-            <Text style={[styles.sectionTitle, { marginLeft: 6 }]}>Featured Events</Text>
-          </View>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/search')}>
-            <Text style={styles.seeAllText}>See all</Text>
-          </TouchableOpacity>
-        </View>
+        <SectionHeader
+          title="Featured Events"
+          actionText="See all"
+          onActionPress={() => router.push('/(tabs)/search')}
+          icon={<Sparkles size={18} color={COLORS.primary} />}
+        />
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.featuredScroll}>
-          {featuredTickets.map((item) => (
-            <EventCard key={item.id} ticket={item} onPress={() => router.push(`/ticket/${item.id}`)} />
-          ))}
+          {loading ? (
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Skeleton width={260} height={170} borderRadius={20} />
+              <Skeleton width={260} height={170} borderRadius={20} />
+            </View>
+          ) : (
+            featuredTickets.map((item) => (
+              <EventCard key={item.id} ticket={item} onPress={() => router.push(`/ticket/${item.id}`)} />
+            ))
+          )}
         </ScrollView>
 
-        {/* Popular Available Tickets Feed */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Popular Tickets</Text>
-          <TouchableOpacity onPress={() => router.push('/(tabs)/search')}>
-            <ArrowRight size={18} color={COLORS.primary} />
-          </TouchableOpacity>
-        </View>
+        {/* Dynamic Location-Based Marketplace Feed */}
+        <SectionHeader
+          title={dynamicSectionTitle}
+          subtitle={
+            selectedLocation === ALL_LOCATIONS_OPTION
+              ? 'Real-time verified tickets from community sellers across all cities'
+              : `Real-time verified tickets available in ${selectedLocation}`
+          }
+          actionText="View all"
+          onActionPress={() => router.push('/(tabs)/search')}
+        />
 
-        {filteredTickets.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No tickets found</Text>
-            <Text style={styles.emptySub}>Try searching for another event or category.</Text>
+        {loading ? (
+          <View style={{ gap: 14 }}>
+            <Skeleton width="100%" height={160} borderRadius={20} />
+            <Skeleton width="100%" height={160} borderRadius={20} />
+          </View>
+        ) : tickets.length === 0 ? (
+          <View style={styles.emptyCard}>
+            <TicketIcon size={32} color={COLORS.primary} />
+            <Text style={styles.emptyTitle}>
+              {selectedLocation === ALL_LOCATIONS_OPTION
+                ? 'No tickets found'
+                : `No tickets found in ${selectedLocation} yet.`}
+            </Text>
+            <Text style={styles.emptySub}>
+              Try searching for another city, category, or view all available listings.
+            </Text>
+            {selectedLocation !== ALL_LOCATIONS_OPTION && (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                style={styles.viewAllBtn}
+                onPress={() => handleSelectLocation(ALL_LOCATIONS_OPTION)}
+              >
+                <Text style={styles.viewAllBtnText}>View All Locations</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
-          filteredTickets.map((ticket) => (
+          tickets.map((ticket) => (
             <TicketCard
               key={ticket.id}
               ticket={ticket}
@@ -152,6 +228,14 @@ export default function HomeScreen() {
           ))
         )}
       </ScrollView>
+
+      {/* Location Picker Modal */}
+      <LocationPickerModal
+        visible={isLocationModalVisible}
+        selectedCity={selectedLocation}
+        onClose={() => setIsLocationModalVisible(false)}
+        onSelectCity={handleSelectLocation}
+      />
     </SafeAreaView>
   );
 }
@@ -163,30 +247,30 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 40,
+    paddingBottom: 90,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 12,
   },
   userRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   greetingTextContainer: {
-    marginLeft: 12,
+    marginLeft: 10,
   },
   greeting: {
     color: COLORS.textSecondary,
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   userName: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   headerActions: {
     flexDirection: 'row',
@@ -196,15 +280,15 @@ const styles = StyleSheet.create({
   adminBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(168, 85, 247, 0.15)',
+    backgroundColor: COLORS.secondaryLight,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(168, 85, 247, 0.3)',
+    borderColor: 'rgba(108, 59, 255, 0.2)',
   },
   adminText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: 11,
     fontWeight: '700',
     marginLeft: 4,
@@ -215,50 +299,91 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  sectionHeader: {
+  locationSelectorBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 18,
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+    marginBottom: 14,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  locationSelectorText: {
+    color: COLORS.textMain,
+    fontSize: 13,
+    fontWeight: '800',
+    marginHorizontal: 6,
+  },
+  heroSection: {
+    marginBottom: 4,
+  },
+  heroTitle: {
+    color: COLORS.textMain,
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: -0.5,
     marginBottom: 12,
   },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    color: COLORS.white,
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  seeAllText: {
-    color: COLORS.secondary,
-    fontSize: 13,
-    fontWeight: '600',
-  },
   categoriesScroll: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
   featuredScroll: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
-  emptyState: {
+  emptyCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 24,
+    borderRadius: 24,
+    padding: 28,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
+    marginVertical: 8,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 10,
+    elevation: 3,
   },
   emptyTitle: {
-    color: COLORS.white,
+    color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
+    marginTop: 8,
+    textAlign: 'center',
   },
   emptySub: {
     color: COLORS.textSecondary,
     fontSize: 13,
     marginTop: 4,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  viewAllBtn: {
+    backgroundColor: COLORS.secondaryLight,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginTop: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(108, 59, 255, 0.2)',
+  },
+  viewAllBtnText: {
+    color: COLORS.primary,
+    fontSize: 13,
+    fontWeight: '700',
   },
 });

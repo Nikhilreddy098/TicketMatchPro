@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ticket, Mail, Lock } from 'lucide-react-native';
+import { Mail, Lock, Smartphone, Sparkles } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
@@ -48,16 +48,13 @@ export default function LoginScreen() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
-        <View style={styles.logoCircle}>
-          <Ticket size={40} color={COLORS.primary} />
-        </View>
-        <Text style={styles.appName}>TicketMatchPro</Text>
-        <Text style={styles.subtitle}>Peer-to-Peer Ticket Marketplace & Exchange</Text>
+        <Image source={require('../../assets/logo.png')} style={styles.logoImage} resizeMode="contain" />
+        <Text style={styles.brandTitle}>TicketMatchPro</Text>
+        <Text style={styles.headline}>Your next experience starts here.</Text>
+        <Text style={styles.subtitle}>Discover, buy and exchange tickets with confidence.</Text>
       </View>
 
-      <View style={styles.formContainer}>
-        <Text style={styles.formTitle}>Welcome Back</Text>
-
+      <View style={styles.formCard}>
         <Input
           label="Email Address"
           placeholder="name@example.com"
@@ -79,25 +76,31 @@ export default function LoginScreen() {
           leftIcon={<Lock size={18} color={COLORS.textSecondary} />}
         />
 
-        <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')} style={styles.forgotBtn}>
-          <Text style={styles.forgotText}>Forgot Password?</Text>
+        <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')} style={styles.forgotBtn} activeOpacity={0.7}>
+          <Text style={styles.forgotText}>Forgot password?</Text>
         </TouchableOpacity>
 
         <Button title="Sign In" onPress={handleLogin} loading={isLoading} size="large" style={styles.signInBtn} />
 
-        <TouchableOpacity activeOpacity={0.8} style={styles.phoneAuthBtn} onPress={() => router.push('/phone-auth' as any)}>
-          <Text style={styles.phoneAuthBtnText}>📱 Sign In with Mobile OTP (+91)</Text>
-        </TouchableOpacity>
+        <Button
+          title="Continue with Phone"
+          onPress={() => router.push('/phone-auth' as any)}
+          variant="outline"
+          size="medium"
+          icon={<Smartphone size={18} color={COLORS.primary} />}
+          style={styles.phoneBtn}
+        />
 
         <TouchableOpacity activeOpacity={0.8} style={styles.demoBtn} onPress={handleDemoAccountLogin}>
-          <Text style={styles.demoBtnText}>⚡ Use Demo Account (demo@ticketmatchpro.app)</Text>
+          <Sparkles size={16} color={COLORS.primary} />
+          <Text style={styles.demoBtnText}>Use Demo Account (demo@ticketmatchpro.app)</Text>
         </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account?</Text>
-        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-          <Text style={styles.signUpText}> Create Account</Text>
+        <Text style={styles.footerText}>New to TicketMatchPro?</Text>
+        <TouchableOpacity onPress={() => router.push('/(auth)/register')} activeOpacity={0.7}>
+          <Text style={styles.signUpText}> Create account</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -113,85 +116,83 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
-  logoCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoImage: {
+    width: 68,
+    height: 68,
+    borderRadius: 18,
     marginBottom: 12,
   },
-  appName: {
-    color: COLORS.white,
-    fontSize: 28,
+  brandTitle: {
+    color: COLORS.primary,
+    fontSize: 16,
     fontWeight: '800',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  headline: {
+    color: COLORS.textMain,
+    fontSize: 24,
+    fontWeight: '800',
+    textAlign: 'center',
     letterSpacing: -0.5,
   },
   subtitle: {
     color: COLORS.textSecondary,
     fontSize: 14,
-    marginTop: 4,
+    marginTop: 6,
     textAlign: 'center',
+    lineHeight: 20,
   },
-  formContainer: {
+  formCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 24,
+    padding: 22,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
-  },
-  formTitle: {
-    color: COLORS.white,
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 16,
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   forgotBtn: {
     alignSelf: 'flex-end',
-    marginBottom: 20,
+    marginBottom: 18,
+    marginTop: -4,
   },
   forgotText: {
-    color: COLORS.secondary,
+    color: COLORS.primary,
     fontSize: 13,
     fontWeight: '600',
   },
   signInBtn: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  phoneAuthBtn: {
-    backgroundColor: 'rgba(124, 58, 237, 0.15)',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(124, 58, 237, 0.3)',
-    marginBottom: 10,
-  },
-  phoneAuthBtnText: {
-    color: COLORS.secondary,
-    fontSize: 13,
-    fontWeight: '700',
+  phoneBtn: {
+    marginBottom: 12,
   },
   demoBtn: {
-    backgroundColor: 'rgba(34, 197, 94, 0.15)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.secondaryLight,
     paddingVertical: 12,
     borderRadius: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(34, 197, 94, 0.3)',
+    marginTop: 4,
   },
   demoBtnText: {
-    color: COLORS.success,
+    color: COLORS.primary,
     fontSize: 13,
     fontWeight: '700',
+    marginLeft: 6,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 24,
+    marginTop: 28,
   },
   footerText: {
     color: COLORS.textSecondary,
