@@ -6,28 +6,40 @@ import { useRouter } from 'next/navigation';
 import { Navbar } from '../../components/Navbar';
 import { Footer } from '../../components/Footer';
 import { supabase } from '../../lib/supabase';
-import { Ticket, Lock, Mail, ArrowRight, AlertCircle } from 'lucide-react';
+import { Ticket, Lock, Mail, ArrowRight, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resending, setResending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [unconfirmedEmail, setUnconfirmedEmail] = useState<string | null>(null);
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setResendSuccess(null);
+    setUnconfirmedEmail(null);
     setLoading(true);
+
+    const cleanEmail = email.trim().toLowerCase();
 
     try {
       const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
+        email: cleanEmail,
         password,
       });
 
       if (authError) {
-        setError(authError.message);
+        if (authError.message.toLowerCase().includes('email not confirmed')) {
+          setUnconfirmedEmail(cleanEmail);
+          setError('Your email address has not been confirmed yet.');
+        } else {
+          setError(authError.message);
+        }
       } else if (data.user) {
         router.push('/dashboard');
       }
@@ -35,6 +47,30 @@ export default function LoginPage() {
       setError(err?.message || 'Login failed.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendConfirmation = async () => {
+    if (!unconfirmedEmail && !email) return;
+    const targetEmail = (unconfirmedEmail || email).trim().toLowerCase();
+    setResending(true);
+    setResendSuccess(null);
+
+    try {
+      const { error: resendErr } = await supabase.auth.resend({
+        type: 'signup',
+        email: targetEmail,
+      });
+
+      if (resendErr) {
+        setError(resendErr.message);
+      } else {
+        setResendSuccess(`Confirmation email successfully sent to ${targetEmail}. Please check your inbox and spam folder.`);
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Failed to resend confirmation email.');
+    } finally {
+      setResending(false);
     }
   };
 
@@ -55,10 +91,36 @@ export default function LoginPage() {
           </div>
 
           <div className="rounded-3xl bg-white p-8 border border-cardBorder shadow-xl space-y-6">
+            {resendSuccess && (
+              <div className="flex items-center gap-2 p-3.5 rounded-xl bg-success/10 text-success text-xs font-semibold border border-success/20">
+                <CheckCircle className="h-4 w-4 shrink-0" />
+                <span>{resendSuccess}</span>
+              </div>
+            )}
+
             {error && (
-              <div className="flex items-center gap-2 p-3.5 rounded-xl bg-error/10 text-error text-xs font-semibold border border-error/20">
-                <AlertCircle className="h-4 w-4 shrink-0" />
-                <span>{error}</span>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 p-3.5 rounded-xl bg-error/10 text-error text-xs font-semibold border border-error/20">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+
+                {unconfirmedEmail && (
+                  <div className="p-4 rounded-2xl bg-secondaryLight border border-primary/20 space-y-3">
+                    <p className="text-xs text-textMain font-medium">
+                      Need a new confirmation link? We can resend it to <strong>{unconfirmedEmail}</strong>.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleResendConfirmation}
+                      disabled={resending}
+                      className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-extrabold text-white shadow-md hover:bg-primary-dark transition-all disabled:opacity-50"
+                    >
+                      <RefreshCw className={`h-3.5 w-3.5 ${resending ? 'animate-spin' : ''}`} />
+                      {resending ? 'Sending Email...' : 'Resend Confirmation Email'}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
 

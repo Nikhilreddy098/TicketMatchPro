@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Mail, Lock, Smartphone, Sparkles } from 'lucide-react-native';
+import { Mail, Lock, Smartphone } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
@@ -32,15 +32,6 @@ export default function LoginScreen() {
     if (res.error) {
       Alert.alert('Login Error', res.error);
     } else {
-      router.replace('/(tabs)/home');
-    }
-  };
-
-  const handleDemoAccountLogin = async () => {
-    setEmail('demo@ticketmatchpro.app');
-    setPassword('Demo@12345');
-    const res = await login('demo@ticketmatchpro.app', 'Demo@12345');
-    if (res.user) {
       router.replace('/(tabs)/home');
     }
   };
@@ -90,11 +81,6 @@ export default function LoginScreen() {
           icon={<Smartphone size={18} color={COLORS.primary} />}
           style={styles.phoneBtn}
         />
-
-        <TouchableOpacity activeOpacity={0.8} style={styles.demoBtn} onPress={handleDemoAccountLogin}>
-          <Sparkles size={16} color={COLORS.primary} />
-          <Text style={styles.demoBtnText}>Use Demo Account (demo@ticketmatchpro.app)</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
@@ -173,21 +159,6 @@ const styles = StyleSheet.create({
   },
   phoneBtn: {
     marginBottom: 12,
-  },
-  demoBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.secondaryLight,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginTop: 4,
-  },
-  demoBtnText: {
-    color: COLORS.primary,
-    fontSize: 13,
-    fontWeight: '700',
-    marginLeft: 6,
   },
   footer: {
     flexDirection: 'row',

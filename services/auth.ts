@@ -1,22 +1,5 @@
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { UserProfile } from '../types/user';
-import { CONFIG } from '../constants/config';
-
-export const DEMO_USER: UserProfile = {
-  id: 'demo-user-123',
-  full_name: 'Demo Account',
-  email: CONFIG.demoAccount.email,
-  avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-  bio: 'Event enthusiast & verified ticket trader.',
-  rating: 4.9,
-  total_sales: 10,
-  total_purchases: 8,
-  total_exchanges: 4,
-  is_verified: true,
-  role: 'admin', // Demo account has admin access for reviewer convenience
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-};
 
 let currentUser: UserProfile | null = null;
 
@@ -59,16 +42,6 @@ export const getCurrentUserProfile = async (): Promise<UserProfile | null> => {
 export const loginWithEmail = async (email: string, pass: string): Promise<{ user: UserProfile | null; error?: string }> => {
   const cleanEmail = email.trim().toLowerCase();
 
-  // Demo Account credential check
-  if (cleanEmail === CONFIG.demoAccount.email.toLowerCase()) {
-    if (pass === 'Demo@12345') {
-      currentUser = DEMO_USER;
-      return { user: DEMO_USER };
-    } else {
-      return { user: null, error: 'Invalid password. Password for Demo Account is Demo@12345' };
-    }
-  }
-
   if (isSupabaseConfigured()) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: pass });
@@ -97,7 +70,7 @@ export const loginWithEmail = async (email: string, pass: string): Promise<{ use
     total_purchases: 0,
     total_exchanges: 0,
     is_verified: true,
-    role: cleanEmail.includes('admin') ? 'admin' : 'user',
+    role: 'user',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
