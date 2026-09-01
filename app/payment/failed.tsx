@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { XCircle, RefreshCw } from 'lucide-react-native';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function PaymentFailedScreen() {
   const router = useRouter();
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textAlign: 'center',
   },
   subtitle: {

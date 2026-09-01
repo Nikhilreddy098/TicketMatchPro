@@ -13,6 +13,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Loading } from '../components/Loading';
 import { COLORS } from '../constants/colors';
 import { formatCurrency, formatDate } from '../utils/formatting';
+import { FONTS } from '../constants/typography';
 
 type TabType = 'listings' | 'purchased' | 'sold' | 'exchanges';
 
@@ -209,11 +210,11 @@ const styles = StyleSheet.create({
   tabText: {
     color: COLORS.textSecondary,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   tabTextActive: {
     color: COLORS.white,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   listContent: {
     padding: 16,
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
   editBtnText: {
     color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   orderCard: {
@@ -265,18 +266,18 @@ const styles = StyleSheet.create({
   orderTitle: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   orderSub: {
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   orderPrice: {
     color: COLORS.success,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   qrTicketBtn: {
     flexDirection: 'row',
@@ -289,7 +290,7 @@ const styles = StyleSheet.create({
   qrTicketBtnText: {
     color: COLORS.white,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 8,
   },
   exchangeTabContent: {

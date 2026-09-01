@@ -5,6 +5,7 @@ import { processPaymentTransaction } from '../../lib/payment';
 import { createOrder } from '../../services/orders';
 import { useAuth } from '../../hooks/useAuth';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function ProcessingScreen() {
   const router = useRouter();
@@ -96,7 +97,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     textAlign: 'center',
   },
   subtitle: {

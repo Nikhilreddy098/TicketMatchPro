@@ -4,6 +4,7 @@ import { Calendar, MapPin } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
 import { Ticket } from '../types/ticket';
 import { formatCurrency, formatShortDate } from '../utils/formatting';
+import { FONTS } from '../constants/typography';
 
 interface EventCardProps {
   ticket: Ticket;
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
   categoryBadge: {
     color: COLORS.white,
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     textTransform: 'uppercase',
   },
   overlay: {
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   eventName: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginBottom: 4,
   },
   infoRow: {
@@ -122,6 +123,6 @@ const styles = StyleSheet.create({
   priceValue: {
     color: '#34D399',
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
 });

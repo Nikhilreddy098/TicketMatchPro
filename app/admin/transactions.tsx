@@ -5,6 +5,7 @@ import { Order } from '../../types/order';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatCurrency, formatDate } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function AdminTransactionsScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -65,12 +66,12 @@ const styles = StyleSheet.create({
   txTitle: {
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   txStatus: {
     color: COLORS.success,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   txSub: {
     color: COLORS.textSecondary,

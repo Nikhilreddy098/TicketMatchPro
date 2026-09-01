@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Bell } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface NotificationBadgeProps {
   count: number;
@@ -41,6 +42,6 @@ const styles = StyleSheet.create({
   badgeText: {
     color: COLORS.white,
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

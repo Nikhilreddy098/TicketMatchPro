@@ -3,6 +3,7 @@ import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { QrCode, CreditCard, Landmark, Wallet, Check } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
 import { PaymentMethodType } from '../types/payment';
+import { FONTS } from '../constants/typography';
 
 interface PaymentMethodCardProps {
   id: PaymentMethodType;
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   subtitle: {
     color: COLORS.textSecondary,

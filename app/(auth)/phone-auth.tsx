@@ -7,6 +7,7 @@ import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
 import { sendPhoneOTP, verifyPhoneOTP } from '../../services/auth';
+import { FONTS } from '../../constants/typography';
 
 export default function PhoneAuthScreen() {
   const router = useRouter();
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   subtitle: {
     color: COLORS.textSecondary,
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   },
   countryCode: {
     color: COLORS.primary,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     fontSize: 15,
     marginRight: 6,
   },
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
   resendLink: {
     color: COLORS.primary,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   disabledText: {
     color: COLORS.textMuted,
@@ -249,6 +250,6 @@ const styles = StyleSheet.create({
   securityText: {
     color: COLORS.textMuted,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
 });

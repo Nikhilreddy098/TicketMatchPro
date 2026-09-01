@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { Bell, Lock, HelpCircle, FileText, Trash2, ChevronRight, Globe, Shield, Info } from 'lucide-react-native';
 import { useAuth } from '../hooks/useAuth';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: COLORS.textMuted,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textTransform: 'uppercase',
     marginBottom: 8,
     marginLeft: 4,
@@ -184,7 +185,7 @@ const styles = StyleSheet.create({
   settingTitle: {
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   settingSub: {
     color: COLORS.textSecondary,

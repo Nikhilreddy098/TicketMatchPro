@@ -57,7 +57,7 @@ export const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             placeholder="Search any city or location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl bg-background pl-10 pr-4 py-2.5 text-sm text-textMain border border-cardBorder focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
+            className="w-full rounded-full bg-background pl-10 pr-4 py-2.5 text-sm text-textMain border border-cardBorder focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all"
             autoFocus
           />
         </div>

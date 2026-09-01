@@ -13,6 +13,7 @@ import { Button } from '../../components/Button';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatCurrency, formatDate, formatTime } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function TicketDetailsScreen() {
   const router = useRouter();
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
   categoryText: {
     color: COLORS.white,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   ownerNoticeBanner: {
     flexDirection: 'row',
@@ -337,7 +338,7 @@ const styles = StyleSheet.create({
   ownerNoticeText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 8,
   },
   card: {
@@ -356,7 +357,7 @@ const styles = StyleSheet.create({
   eventName: {
     color: COLORS.textMain,
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 14,
   },
   metaGroup: {
@@ -371,12 +372,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 14,
     marginLeft: 10,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   sectionTitle: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 12,
     marginTop: 8,
   },
@@ -397,12 +398,12 @@ const styles = StyleSheet.create({
   seatLabel: {
     color: COLORS.textSecondary,
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   seatValue: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 2,
   },
   descriptionText: {
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
   sellerName: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   ratingRow: {
     flexDirection: 'row',
@@ -432,7 +433,7 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 12,
     marginLeft: 4,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   chatBtn: {
     backgroundColor: COLORS.secondaryLight,
@@ -466,12 +467,12 @@ const styles = StyleSheet.create({
   priceLabel: {
     color: COLORS.textSecondary,
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   bottomPrice: {
     color: COLORS.success,
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   bottomOriginal: {
     color: COLORS.textMuted,
@@ -501,7 +502,7 @@ const styles = StyleSheet.create({
   exchangeBarBtnText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   buyBarBtn: {
@@ -518,7 +519,7 @@ const styles = StyleSheet.create({
   ownerBadgeText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   errorContainer: {
     flex: 1,
@@ -530,7 +531,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     color: COLORS.textMain,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   errorSub: {
     color: COLORS.textSecondary,

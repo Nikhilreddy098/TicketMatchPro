@@ -4,6 +4,7 @@ import { Tabs, useRouter } from 'expo-router';
 import { Home, Search, PlusCircle, Heart, User } from 'lucide-react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function TabsLayout() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: COLORS.textSecondary,
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '700',
+          fontFamily: FONTS.bold,
         },
         sceneStyle: { backgroundColor: COLORS.background },
       }}

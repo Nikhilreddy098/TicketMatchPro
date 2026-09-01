@@ -15,6 +15,7 @@ import { CATEGORIES } from '../../constants/categories';
 import { ALL_LOCATIONS_OPTION } from '../../constants/cities';
 import { getSavedMarketplaceLocation, saveMarketplaceLocation } from '../../services/location';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function SearchScreen() {
   const router = useRouter();
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   locationChipText: {
     color: COLORS.textMain,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   locationChipTextActive: {
@@ -299,7 +300,7 @@ const styles = StyleSheet.create({
   resultsCount: {
     color: COLORS.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   sortTrigger: {
     flexDirection: 'row',
@@ -314,7 +315,7 @@ const styles = StyleSheet.create({
   sortTriggerText: {
     color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   listContent: {
@@ -348,7 +349,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginLeft: 8,
   },
   modalBody: {
@@ -357,7 +358,7 @@ const styles = StyleSheet.create({
   filterSectionTitle: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginBottom: 10,
     marginTop: 6,
   },
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
   modalLocationBtnText: {
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 8,
   },
   sortGroup: {
@@ -401,11 +402,11 @@ const styles = StyleSheet.create({
   sortChipText: {
     color: COLORS.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   sortChipTextSelected: {
     color: COLORS.white,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   priceRow: {
     flexDirection: 'row',

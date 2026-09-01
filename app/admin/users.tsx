@@ -5,6 +5,7 @@ import { UserProfile } from '../../types/user';
 import { Avatar } from '../../components/Avatar';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function AdminUsersScreen() {
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -91,12 +92,12 @@ const styles = StyleSheet.create({
   userName: {
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   roleTag: {
     color: COLORS.secondary,
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginLeft: 6,
     backgroundColor: 'rgba(168, 85, 247, 0.15)',
     paddingHorizontal: 6,
@@ -124,6 +125,6 @@ const styles = StyleSheet.create({
   suspendText: {
     color: COLORS.error,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
 });

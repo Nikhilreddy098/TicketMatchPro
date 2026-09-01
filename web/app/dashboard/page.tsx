@@ -104,7 +104,7 @@ export default function DashboardPage() {
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <Link
               href="/sell"
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-5 py-3 text-xs font-extrabold text-white shadow-lg shadow-primary/25 hover:bg-primary-dark transition-all"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full bg-primary px-5 py-3 text-xs font-extrabold text-white shadow-lg shadow-primary/25 hover:bg-primary-dark transition-all"
             >
               <PlusCircle className="h-4 w-4" />
               List New Ticket
@@ -168,7 +168,7 @@ export default function DashboardPage() {
               </p>
               <Link
                 href="/sell"
-                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20"
               >
                 List a Ticket Now
               </Link>
@@ -190,7 +190,7 @@ export default function DashboardPage() {
               </p>
               <Link
                 href="/browse"
-                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20"
               >
                 Browse Marketplace
               </Link>
@@ -217,7 +217,7 @@ export default function DashboardPage() {
                     <span className="text-textSecondary">Digital Entry QR Status: <strong>VERIFIED VALID</strong></span>
                     <Link
                       href={`/orders?id=${order.id}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary text-white text-xs font-bold shadow-sm"
                     >
                       <QrCode className="h-3.5 w-3.5" />
                       View Digital Pass

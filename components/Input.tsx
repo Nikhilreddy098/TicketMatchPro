@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TextInputProps, StyleSheet } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -17,7 +18,7 @@ export const Input: React.FC<InputProps> = ({ label, error, leftIcon, rightIcon,
         {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
         <TextInput
           placeholderTextColor={COLORS.textMuted}
-          style={[styles.input, leftIcon ? { paddingLeft: 42 } : null, rightIcon ? { paddingRight: 42 } : null, style]}
+          style={[styles.input, leftIcon ? { paddingLeft: 44 } : null, rightIcon ? { paddingRight: 44 } : null, style]}
           {...props}
         />
         {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
@@ -35,13 +36,13 @@ const styles = StyleSheet.create({
   label: {
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
     marginBottom: 6,
   },
   inputWrapper: {
     position: 'relative',
     backgroundColor: COLORS.inputBg,
-    borderRadius: 12,
+    borderRadius: 999,
     borderWidth: 1,
     borderColor: COLORS.inputBorder,
     justifyContent: 'center',
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
   input: {
     color: COLORS.textMain,
     fontSize: 15,
+    fontFamily: FONTS.regular,
     paddingVertical: 13,
     paddingHorizontal: 16,
   },
@@ -69,6 +71,6 @@ const styles = StyleSheet.create({
     color: COLORS.error,
     fontSize: 12,
     marginTop: 4,
-    fontWeight: '500',
+    fontFamily: FONTS.medium,
   },
 });

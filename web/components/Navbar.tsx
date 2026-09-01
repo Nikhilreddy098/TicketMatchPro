@@ -46,7 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex h-16 items-center justify-between gap-4">
             {/* Brand Logo */}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-md shadow-primary/20 group-hover:scale-105 transition-transform">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white group-hover:scale-105 transition-transform">
                 <Ticket className="h-5 w-5 transform -rotate-12" />
               </div>
               <span className="text-xl font-extrabold tracking-tight text-textMain">
@@ -90,7 +90,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div className="flex items-center gap-3">
               <Link
                 href="/sell"
-                className="hidden sm:flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white shadow-md shadow-primary/20 hover:bg-primary-dark transition-all transform active:scale-95"
+                className="hidden sm:flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-white hover:bg-primary-dark transition-all"
               >
                 <PlusCircle className="h-4 w-4" />
                 <span>Sell Ticket</span>

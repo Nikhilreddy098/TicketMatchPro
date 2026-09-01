@@ -11,6 +11,7 @@ import { Button } from '../../components/Button';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatCurrency } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function CreateExchangeScreen() {
   const router = useRouter();
@@ -209,7 +210,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   subtitle: {
     color: COLORS.textSecondary,
@@ -232,14 +233,14 @@ const styles = StyleSheet.create({
   cardLabel: {
     color: COLORS.primary,
     fontSize: 11,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textTransform: 'uppercase',
     marginBottom: 4,
   },
   eventTitle: {
     color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   eventSub: {
     color: COLORS.textSecondary,
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
   eventPrice: {
     color: COLORS.success,
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 8,
   },
   arrowContainer: {
@@ -282,7 +283,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 12,
   },
   noTicketsBox: {
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
   noTicketsTitle: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   noTicketsSub: {
     color: COLORS.textSecondary,
@@ -317,7 +318,7 @@ const styles = StyleSheet.create({
   ticketOptionName: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   ticketOptionSub: {
     color: COLORS.textSecondary,

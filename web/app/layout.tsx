@@ -1,7 +1,15 @@
 import type { Metadata } from 'next';
+import { Be_Vietnam_Pro } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '../components/AuthProvider';
 import { OrganizationJsonLd } from '../components/JsonLd';
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-be-vietnam-pro',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ticketmatchpro.com'),
@@ -69,7 +77,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={beVietnamPro.variable}>
       <head>
         <OrganizationJsonLd />
       </head>

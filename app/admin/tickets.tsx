@@ -5,6 +5,7 @@ import { Ticket } from '../../types/ticket';
 import { TicketCard } from '../../components/TicketCard';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function AdminTicketsScreen() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -76,6 +77,6 @@ const styles = StyleSheet.create({
   removeBtnText: {
     color: COLORS.white,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

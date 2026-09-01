@@ -114,7 +114,7 @@ function BrowseContent() {
                 placeholder="Search event name, venue, or artist..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl bg-background pl-10 pr-4 py-2.5 text-sm text-textMain border border-cardBorder focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full rounded-full bg-background pl-10 pr-4 py-2.5 text-sm text-textMain border border-cardBorder focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
               {searchQuery && (
                 <button
@@ -133,7 +133,7 @@ function BrowseContent() {
                 placeholder="Min ₹"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                className="w-full rounded-xl bg-background px-3 py-2.5 text-xs text-textMain border border-cardBorder focus:border-primary focus:outline-none"
+                className="w-full rounded-full bg-background px-3 py-2.5 text-xs text-textMain border border-cardBorder focus:border-primary focus:outline-none"
               />
               <span className="text-textSecondary text-xs font-bold">-</span>
               <input
@@ -141,7 +141,7 @@ function BrowseContent() {
                 placeholder="Max ₹"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                className="w-full rounded-xl bg-background px-3 py-2.5 text-xs text-textMain border border-cardBorder focus:border-primary focus:outline-none"
+                className="w-full rounded-full bg-background px-3 py-2.5 text-xs text-textMain border border-cardBorder focus:border-primary focus:outline-none"
               />
             </div>
 
@@ -189,7 +189,7 @@ function BrowseContent() {
             {(selectedCategory || minPrice || maxPrice || searchQuery || selectedLocation !== ALL_LOCATIONS_OPTION) && (
               <button
                 onClick={handleResetFilters}
-                className="ml-auto px-3 py-1.5 rounded-xl text-xs font-bold text-error bg-error/10 hover:bg-error/20 transition-all shrink-0"
+                className="ml-auto px-3 py-1.5 rounded-full text-xs font-bold text-error bg-error/10 hover:bg-error/20 transition-all shrink-0"
               >
                 Reset Filters
               </button>

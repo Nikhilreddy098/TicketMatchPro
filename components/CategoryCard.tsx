@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import { Music, Trophy, Film, Sparkles, Clapperboard, GraduationCap, Grid, Ticket as TicketIcon } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
 import { Category } from '../constants/categories';
+import { FONTS } from '../constants/typography';
 
 interface CategoryCardProps {
   category: Category;
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   selectedTitle: {
     color: COLORS.white,

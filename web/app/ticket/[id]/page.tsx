@@ -110,7 +110,7 @@ export default function TicketDetailsPage() {
           <p className="text-xs text-textSecondary">{error || 'This listing does not exist.'}</p>
           <Link
             href="/browse"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/20"
           >
             <ArrowLeft className="h-4 w-4" /> Return to Marketplace
           </Link>

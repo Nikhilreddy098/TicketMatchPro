@@ -6,6 +6,7 @@ import { Button } from './Button';
 import { POPULAR_CITIES, ALL_LOCATIONS_OPTION, searchCities } from '../constants/cities';
 import { getCurrentLocationCity } from '../services/location';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface LocationPickerModalProps {
   visible: boolean;
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   closeBtn: {
     padding: 6,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
   locationActionText: {
     color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   allLocationsBtn: {
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
   allLocationsText: {
     color: COLORS.textMain,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   allLocationsTextActive: {
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   customCityTitle: {
     color: COLORS.primary,
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   customCitySub: {
     color: COLORS.textSecondary,
@@ -293,7 +294,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 10,
   },
   popularGrid: {
@@ -318,11 +319,11 @@ const styles = StyleSheet.create({
   cityChipText: {
     color: COLORS.textMain,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   cityChipTextSelected: {
     color: COLORS.white,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   cityRow: {
     flexDirection: 'row',
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
   cityName: {
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   cityNameSelected: {
     color: COLORS.primary,

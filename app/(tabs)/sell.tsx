@@ -11,6 +11,7 @@ import { CATEGORIES, Category } from '../../constants/categories';
 import { COLORS } from '../../constants/colors';
 import { ticketListingSchema } from '../../utils/validation';
 import { createTicketListing } from '../../services/tickets';
+import { FONTS } from '../../constants/typography';
 
 export default function SellScreen() {
   const router = useRouter();
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   headerSubtitle: {
     color: COLORS.textSecondary,
@@ -354,7 +355,7 @@ const styles = StyleSheet.create({
   imageOverlayText: {
     color: COLORS.white,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   uploadPlaceholder: {
     flex: 1,
@@ -365,7 +366,7 @@ const styles = StyleSheet.create({
   uploadTitle: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginTop: 8,
   },
   uploadSub: {
@@ -388,13 +389,13 @@ const styles = StyleSheet.create({
   sectionLabel: {
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginBottom: 10,
   },
   sectionHeaderTitle: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 10,
     marginBottom: 12,
     paddingTop: 10,

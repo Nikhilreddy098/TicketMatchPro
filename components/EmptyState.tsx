@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { TicketX } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
 import { Button } from './Button';
+import { FONTS } from '../constants/typography';
 
 interface EmptyStateProps {
   title: string;
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     textAlign: 'center',
     marginBottom: 8,
   },

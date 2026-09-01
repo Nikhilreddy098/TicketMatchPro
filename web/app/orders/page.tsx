@@ -130,7 +130,7 @@ function OrdersContent() {
             <button
               onClick={handleCheckout}
               disabled={purchasing}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-sm font-extrabold text-white shadow-xl shadow-primary/25 hover:bg-primary-dark transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 rounded-full bg-primary py-4 text-sm font-extrabold text-white shadow-xl shadow-primary/25 hover:bg-primary-dark transition-all disabled:opacity-50"
             >
               {purchasing ? 'Processing Order...' : 'Confirm & Complete Order'}
             </button>

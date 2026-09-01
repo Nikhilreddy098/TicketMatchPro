@@ -5,6 +5,7 @@ import { Mail } from 'lucide-react-native';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 8,
   },
   description: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   successTitle: {
     color: COLORS.success,
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginBottom: 8,
   },
   successText: {
