@@ -1,6 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { UserProfile } from '../types/user';
-import { getCurrentUserProfile, loginWithEmail, registerWithEmail, logoutUser, DEMO_USER } from '../services/auth';
+import { getCurrentUserProfile, loginWithEmail, registerWithEmail, logoutUser } from '../services/auth';
 
 interface AuthContextType {
   user: UserProfile | null;
