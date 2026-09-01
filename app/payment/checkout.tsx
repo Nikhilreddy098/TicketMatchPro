@@ -13,6 +13,7 @@ import { Input } from '../../components/Input';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatCurrency } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
   demoNoticeTitle: {
     color: COLORS.success,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     letterSpacing: 0.5,
   },
   demoNoticeSub: {
@@ -224,13 +225,13 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginBottom: 12,
   },
   eventTitle: {
     color: COLORS.white,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   eventSub: {
     color: COLORS.textSecondary,
@@ -240,7 +241,7 @@ const styles = StyleSheet.create({
   ticketTypeBadge: {
     color: COLORS.secondary,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginTop: 8,
     textTransform: 'uppercase',
   },
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
   priceVal: {
     color: COLORS.white,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   divider: {
     height: 1,
@@ -266,12 +267,12 @@ const styles = StyleSheet.create({
   totalLabel: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   totalVal: {
     color: COLORS.success,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   modeToggleRow: {
     flexDirection: 'row',
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
   modeToggleText: {
     color: COLORS.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   securityRow: {
     flexDirection: 'row',

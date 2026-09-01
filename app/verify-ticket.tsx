@@ -8,6 +8,7 @@ import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { COLORS } from '../constants/colors';
 import { formatDate } from '../utils/formatting';
+import { FONTS } from '../constants/typography';
 
 export default function VerifyTicketScreen() {
   const { qrHash: initialHash } = useLocalSearchParams<{ qrHash?: string }>();
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   subtitle: {
     color: COLORS.textSecondary,
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   validTitle: {
     color: COLORS.success,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 12,
   },
   validSub: {
@@ -178,7 +179,7 @@ const styles = StyleSheet.create({
   usedTitle: {
     color: COLORS.warning,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 12,
   },
   invalidResult: {
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   invalidTitle: {
     color: COLORS.error,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 12,
   },
 });

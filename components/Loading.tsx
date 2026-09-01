@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface LoadingProps {
   message?: string;
@@ -30,6 +31,6 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 14,
     marginTop: 12,
-    fontWeight: '500',
+    fontFamily: FONTS.medium,
   },
 });

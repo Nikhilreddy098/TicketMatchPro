@@ -10,6 +10,7 @@ import { Loading } from '../../components/Loading';
 import { Avatar } from '../../components/Avatar';
 import { COLORS } from '../../constants/colors';
 import { formatDate } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function ChatListScreen() {
   const router = useRouter();
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
   name: {
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   timestamp: {
     color: COLORS.textMuted,

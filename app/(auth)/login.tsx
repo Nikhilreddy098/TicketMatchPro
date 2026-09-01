@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 import { loginSchema } from '../../utils/validation';
 
 export default function LoginScreen() {
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
   brandTitle: {
     color: COLORS.primary,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginBottom: 8,
@@ -121,13 +122,14 @@ const styles = StyleSheet.create({
   headline: {
     color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
   subtitle: {
     color: COLORS.textSecondary,
     fontSize: 14,
+    fontFamily: FONTS.regular,
     marginTop: 6,
     textAlign: 'center',
     lineHeight: 20,
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
   forgotText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   signInBtn: {
     marginBottom: 12,
@@ -168,10 +170,11 @@ const styles = StyleSheet.create({
   footerText: {
     color: COLORS.textSecondary,
     fontSize: 14,
+    fontFamily: FONTS.regular,
   },
   signUpText: {
     color: COLORS.primary,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

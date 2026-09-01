@@ -44,7 +44,7 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-white">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
                 <Ticket className="h-4 w-4 transform -rotate-12" />
               </div>
               <span className="text-lg font-extrabold text-textMain">

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Image, Text, StyleSheet } from 'react-native';
 import { CheckCircle2 } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface AvatarProps {
   url?: string;
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
   },
   initials: {
     color: COLORS.white,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   badge: {
     position: 'absolute',

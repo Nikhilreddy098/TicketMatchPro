@@ -1,6 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface ButtonProps {
   title: string;
@@ -43,7 +44,7 @@ export const Button: React.FC<ButtonProps> = ({
     let textBase: TextStyle = styles.text;
 
     if (size === 'small') textBase = { ...textBase, fontSize: 13 };
-    if (size === 'large') textBase = { ...textBase, fontSize: 16, fontWeight: '700' };
+    if (size === 'large') textBase = { ...textBase, fontSize: 16 };
 
     if (variant === 'outline') return [textBase, { color: COLORS.textMain }, textStyle];
     if (variant === 'secondary') return [textBase, { color: COLORS.primary }, textStyle];
@@ -74,17 +75,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 14,
+    borderRadius: 999,
     paddingVertical: 14,
     paddingHorizontal: 20,
   },
   primary: {
     backgroundColor: COLORS.primary,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
   },
   secondary: {
     backgroundColor: COLORS.secondaryLight,
@@ -103,6 +99,6 @@ const styles = StyleSheet.create({
   text: {
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

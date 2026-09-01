@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Search, SlidersHorizontal, X } from 'lucide-react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface SearchBarProps {
   value: string;
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.card,
-    borderRadius: 14,
+    borderRadius: 24,
     borderWidth: 1,
     borderColor: COLORS.cardBorder,
     paddingHorizontal: 14,
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '500',
+    fontFamily: FONTS.medium,
   },
   clearBtn: {
     padding: 4,
@@ -80,14 +81,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     height: 48,
     width: 48,
-    borderRadius: 14,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 3,
   },
 });

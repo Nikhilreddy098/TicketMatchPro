@@ -7,6 +7,7 @@ import { Avatar } from '../components/Avatar';
 import { Input } from '../components/Input';
 import { Button } from '../components/Button';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 export default function EditProfileScreen() {
   const router = useRouter();
@@ -76,7 +77,7 @@ const styles = StyleSheet.create({
   changeAvatarText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   card: {
     backgroundColor: COLORS.card,

@@ -11,6 +11,7 @@ import { Avatar } from '../../components/Avatar';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
 import { formatDate, formatCurrency } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function ExchangeListScreen() {
   const router = useRouter();
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
   tabText: {
     color: COLORS.textSecondary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   tabTextActive: {
     color: COLORS.white,
@@ -291,12 +292,12 @@ const styles = StyleSheet.create({
   partyName: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   partyRole: {
     color: COLORS.textSecondary,
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   badge: {
     flexDirection: 'row',
@@ -307,7 +308,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 4,
     textTransform: 'capitalize',
   },
@@ -327,19 +328,19 @@ const styles = StyleSheet.create({
   swapLabel: {
     color: COLORS.textSecondary,
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     textTransform: 'uppercase',
   },
   swapValue: {
     color: COLORS.textMain,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginTop: 2,
   },
   swapPrice: {
     color: COLORS.success,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginTop: 2,
   },
   swapIconCircle: {
@@ -367,7 +368,7 @@ const styles = StyleSheet.create({
   timestamp: {
     color: COLORS.textSecondary,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   quickActions: {
     flexDirection: 'row',

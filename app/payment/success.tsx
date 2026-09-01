@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { CheckCircle2, Ticket, QrCode, ArrowRight } from 'lucide-react-native';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function PaymentSuccessScreen() {
   const router = useRouter();
@@ -87,7 +88,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textAlign: 'center',
   },
   subtitle: {
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
   demoBadgeText: {
     color: COLORS.success,
     fontSize: 11,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     letterSpacing: 0.5,
   },
   infoCard: {
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
   infoVal: {
     color: COLORS.white,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   hashVal: {
     color: COLORS.secondary,

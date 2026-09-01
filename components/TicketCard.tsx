@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from '../utils/formatting';
 import { Avatar } from './Avatar';
 import { toggleFavorite } from '../services/favorites';
 import { useAuth } from '../hooks/useAuth';
+import { FONTS } from '../constants/typography';
 
 interface TicketCardProps {
   ticket: Ticket;
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
   categoryText: {
     color: COLORS.white,
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   body: {
     padding: 16,
@@ -168,7 +169,7 @@ const styles = StyleSheet.create({
   eventName: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginBottom: 6,
   },
   metaRow: {
@@ -199,7 +200,7 @@ const styles = StyleSheet.create({
   },
   seatHighlight: {
     color: COLORS.textMain,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   divider: {
     height: 1,
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
   sellerName: {
     color: COLORS.textMain,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   verifiedBadge: {
     flexDirection: 'row',
@@ -233,7 +234,7 @@ const styles = StyleSheet.create({
     color: COLORS.success,
     fontSize: 10,
     marginLeft: 2,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   priceContainer: {
     alignItems: 'flex-end',
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
   sellingPrice: {
     color: COLORS.primary,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   actionButtonsRow: {
     flexDirection: 'row',
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   exchangeBtnText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 6,
   },
   buyBtn: {
@@ -279,6 +280,6 @@ const styles = StyleSheet.create({
   buyBtnText: {
     color: COLORS.white,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

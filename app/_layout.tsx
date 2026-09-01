@@ -11,6 +11,15 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import NetInfo from '@react-native-community/netinfo';
+import * as SplashScreen from 'expo-splash-screen';
+import {
+  useFonts,
+  BeVietnamPro_400Regular,
+  BeVietnamPro_500Medium,
+  BeVietnamPro_600SemiBold,
+  BeVietnamPro_700Bold,
+  BeVietnamPro_800ExtraBold,
+} from '@expo-google-fonts/be-vietnam-pro';
 
 import { AuthContext, useAuth } from '../hooks/useAuth';
 import { UserProfile } from '../types/user';
@@ -25,6 +34,14 @@ import {
 
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Default every <Text> to the app's body font; any explicit fontFamily
+// set on a specific style (e.g. bold headings) still overrides this.
+(Text as any).defaultProps = (Text as any).defaultProps || {};
+(Text as any).defaultProps.style = [{ fontFamily: FONTS.regular }, (Text as any).defaultProps.style];
 
 function AuthRouterGuard() {
   const router = useRouter();
@@ -62,7 +79,7 @@ function AuthRouterGuard() {
         },
         headerTintColor: COLORS.white,
         headerTitleStyle: {
-          fontWeight: '700',
+          fontFamily: FONTS.bold,
         },
         contentStyle: {
           backgroundColor: COLORS.background,
@@ -107,6 +124,19 @@ function AuthRouterGuard() {
 export default function RootLayout() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fontsLoaded, fontError] = useFonts({
+    BeVietnamPro_400Regular,
+    BeVietnamPro_500Medium,
+    BeVietnamPro_600SemiBold,
+    BeVietnamPro_700Bold,
+    BeVietnamPro_800ExtraBold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded || fontError) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [fontsLoaded, fontError]);
 
   // --------------------------------------------------
   // AUTH INITIALIZATION & SESSION LISTENER
@@ -200,6 +230,10 @@ export default function RootLayout() {
 
   const isAdmin = Boolean(user && user.role === 'admin');
 
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
+
   // --------------------------------------------------
   // NORMAL APPLICATION
   // --------------------------------------------------
@@ -254,7 +288,7 @@ const styles = StyleSheet.create({
   title: {
     color: '#FFFFFF',
     fontSize: 27,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textAlign: 'center',
     marginBottom: 14,
   },
@@ -289,7 +323,7 @@ const styles = StyleSheet.create({
   retryText: {
     color: '#FFFFFF',
     fontSize: 17,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 
   footerText: {

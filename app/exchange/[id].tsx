@@ -10,6 +10,7 @@ import { Avatar } from '../../components/Avatar';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatDate, formatCurrency } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function ExchangeDetailsScreen() {
   const router = useRouter();
@@ -236,14 +237,14 @@ const styles = StyleSheet.create({
   statusLabel: {
     color: COLORS.primary,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     letterSpacing: 1,
   },
   createdDate: {
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 4,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   card: {
     backgroundColor: COLORS.card,
@@ -261,7 +262,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 12,
   },
   participantRow: {
@@ -271,13 +272,13 @@ const styles = StyleSheet.create({
   participantName: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   participantRole: {
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   divider: {
     height: 1,
@@ -294,24 +295,24 @@ const styles = StyleSheet.create({
   ticketBoxTag: {
     color: COLORS.secondary,
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginBottom: 4,
   },
   ticketBoxTitle: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   ticketBoxSub: {
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   ticketPrice: {
     color: COLORS.success,
     fontSize: 14,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 6,
   },
   swapIconRow: {
@@ -355,7 +356,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
     lineHeight: 18,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   errorContainer: {
     flex: 1,
@@ -367,6 +368,6 @@ const styles = StyleSheet.create({
   errorTitle: {
     color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
 });

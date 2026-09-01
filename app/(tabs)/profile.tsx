@@ -21,6 +21,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Avatar } from '../../components/Avatar';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
   userName: {
     color: COLORS.textMain,
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 12,
   },
   userEmail: {
@@ -253,7 +254,7 @@ const styles = StyleSheet.create({
   verifiedBadgeText: {
     color: COLORS.success,
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 4,
   },
   ratingBadge: {
@@ -267,7 +268,7 @@ const styles = StyleSheet.create({
   ratingBadgeText: {
     color: COLORS.warning,
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 4,
   },
   statsContainer: {
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
   statValue: {
     color: COLORS.textMain,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   statLabel: {
     color: COLORS.textSecondary,
@@ -318,7 +319,7 @@ const styles = StyleSheet.create({
   adminBannerTitle: {
     color: COLORS.textMain,
     fontSize: 15,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   adminBannerSub: {
     color: COLORS.primary,
@@ -341,7 +342,7 @@ const styles = StyleSheet.create({
   menuSectionHeader: {
     color: COLORS.textMuted,
     fontSize: 12,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textTransform: 'uppercase',
     marginBottom: 12,
     marginLeft: 4,
@@ -367,6 +368,6 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.textMain,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

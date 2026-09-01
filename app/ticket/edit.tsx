@@ -7,6 +7,7 @@ import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function TicketEditScreen() {
   const router = useRouter();
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   eventName: {
     color: COLORS.textSecondary,

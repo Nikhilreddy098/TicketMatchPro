@@ -7,6 +7,7 @@ import { Button } from '../../components/Button';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatCurrency, formatDate } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function OrderDetailsScreen() {
   const router = useRouter();
@@ -73,7 +74,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   date: {
     color: COLORS.textMuted,
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   eventTitle: {
     color: COLORS.white,
     fontSize: 17,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   subText: {
     color: COLORS.textSecondary,
@@ -116,11 +117,11 @@ const styles = StyleSheet.create({
   val: {
     color: COLORS.white,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   totalVal: {
     color: COLORS.success,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
 });

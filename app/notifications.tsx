@@ -9,6 +9,7 @@ import { EmptyState } from '../components/EmptyState';
 import { Loading } from '../components/Loading';
 import { COLORS } from '../constants/colors';
 import { formatDate } from '../utils/formatting';
+import { FONTS } from '../constants/typography';
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -124,12 +125,12 @@ const styles = StyleSheet.create({
   headerTitle: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   markReadText: {
     color: COLORS.primary,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   listContent: {
     padding: 16,
@@ -167,7 +168,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.white,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   unreadDot: {
     width: 8,

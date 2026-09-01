@@ -19,6 +19,7 @@ import { LocationPickerModal } from '../../components/LocationPickerModal';
 import { ALL_LOCATIONS_OPTION } from '../../constants/cities';
 import { getSavedMarketplaceLocation, saveMarketplaceLocation } from '../../services/location';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -265,12 +266,12 @@ const styles = StyleSheet.create({
   greeting: {
     color: COLORS.textSecondary,
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
   },
   userName: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   headerActions: {
     flexDirection: 'row',
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
   adminText: {
     color: COLORS.primary,
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginLeft: 4,
   },
   verifyBtn: {
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
   locationSelectorText: {
     color: COLORS.textMain,
     fontSize: 13,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginHorizontal: 6,
   },
   heroSection: {
@@ -334,7 +335,7 @@ const styles = StyleSheet.create({
   heroTitle: {
     color: COLORS.textMain,
     fontSize: 24,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     letterSpacing: -0.5,
     marginBottom: 12,
   },
@@ -361,7 +362,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     color: COLORS.textMain,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 8,
     textAlign: 'center',
   },
@@ -384,6 +385,6 @@ const styles = StyleSheet.create({
   viewAllBtnText: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

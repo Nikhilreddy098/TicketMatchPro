@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { Input } from '../../components/Input';
 import { Button } from '../../components/Button';
 import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/typography';
 import { registerSchema } from '../../utils/validation';
 
 export default function RegisterScreen() {
@@ -130,12 +131,13 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.textMain,
     fontSize: 22,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     textAlign: 'center',
   },
   subtitle: {
     color: COLORS.textSecondary,
     fontSize: 14,
+    fontFamily: FONTS.regular,
     marginTop: 4,
     textAlign: 'center',
   },
@@ -162,10 +164,11 @@ const styles = StyleSheet.create({
   footerText: {
     color: COLORS.textSecondary,
     fontSize: 14,
+    fontFamily: FONTS.regular,
   },
   signInText: {
     color: COLORS.primary,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

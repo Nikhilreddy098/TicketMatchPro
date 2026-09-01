@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/colors';
+import { FONTS } from '../constants/typography';
 
 interface SectionHeaderProps {
   title: string;
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
   title: {
     color: COLORS.textMain,
     fontSize: 19,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     letterSpacing: -0.3,
   },
   subtitle: {
@@ -64,6 +65,6 @@ const styles = StyleSheet.create({
   actionText: {
     color: COLORS.primary,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
 });

@@ -6,6 +6,7 @@ import { getAdminStats } from '../../services/admin';
 import { useAuth } from '../../hooks/useAuth';
 import { COLORS } from '../../constants/colors';
 import { formatCurrency } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function AdminDashboardScreen() {
   const router = useRouter();
@@ -138,7 +139,7 @@ const styles = StyleSheet.create({
   adminTitle: {
     color: COLORS.white,
     fontSize: 18,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   adminSub: {
     color: COLORS.textSecondary,
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: COLORS.textMuted,
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     textTransform: 'uppercase',
     marginBottom: 10,
     marginLeft: 4,
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
   statVal: {
     color: COLORS.white,
     fontSize: 20,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   statLab: {
     color: COLORS.textMuted,
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: COLORS.white,
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: FONTS.semiBold,
     marginLeft: 12,
   },
   divider: {
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
   unauthorizedTitle: {
     color: COLORS.white,
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginTop: 12,
   },
   unauthorizedSub: {

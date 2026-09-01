@@ -102,7 +102,7 @@ export const TicketCard: React.FC<TicketCardProps> = ({ ticket, showActions = tr
             <div className="flex items-center gap-2">
               <Link
                 href={`/ticket/${ticket.id}`}
-                className="flex items-center gap-1 px-3.5 py-2 rounded-xl bg-primary text-white text-xs font-extrabold hover:bg-primary-dark shadow-sm transition-all"
+                className="flex items-center gap-1 px-3.5 py-2 rounded-full bg-primary text-white text-xs font-extrabold hover:bg-primary-dark shadow-sm transition-all"
               >
                 View Details
               </Link>

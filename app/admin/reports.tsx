@@ -5,6 +5,7 @@ import { Report } from '../../types/database';
 import { Loading } from '../../components/Loading';
 import { COLORS } from '../../constants/colors';
 import { formatDate } from '../../utils/formatting';
+import { FONTS } from '../../constants/typography';
 
 export default function AdminReportsScreen() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -58,12 +59,12 @@ const styles = StyleSheet.create({
   reason: {
     color: COLORS.white,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
   },
   status: {
     color: COLORS.warning,
     fontSize: 11,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 4,
   },
   date: {

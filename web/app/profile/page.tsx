@@ -116,7 +116,7 @@ export default function ProfilePage() {
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl bg-background px-4 py-2.5 text-xs text-textMain border border-cardBorder focus:border-primary focus:outline-none"
+                    className="w-full rounded-full bg-background px-4 py-2.5 text-xs text-textMain border border-cardBorder focus:border-primary focus:outline-none"
                   />
                 </div>
 
@@ -134,7 +134,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={updating}
-                  className="flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-3 text-xs font-extrabold text-white shadow-xl shadow-primary/25 hover:bg-primary-dark transition-all disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-xs font-extrabold text-white shadow-xl shadow-primary/25 hover:bg-primary-dark transition-all disabled:opacity-50"
                 >
                   {updating ? 'Saving Profile...' : 'Save Profile Changes'}
                 </button>

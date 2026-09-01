@@ -10,6 +10,7 @@ import { Button } from '../components/Button';
 import { Loading } from '../components/Loading';
 import { COLORS } from '../constants/colors';
 import { formatDate, formatTime } from '../utils/formatting';
+import { FONTS } from '../constants/typography';
 
 export default function DigitalTicketScreen() {
   const router = useRouter();
@@ -182,7 +183,7 @@ const styles = StyleSheet.create({
   eventTitle: {
     color: COLORS.white,
     fontSize: 17,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
   },
   venueRow: {
     flexDirection: 'row',
@@ -205,13 +206,13 @@ const styles = StyleSheet.create({
   label: {
     color: COLORS.textMuted,
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     letterSpacing: 0.5,
   },
   value: {
     color: COLORS.white,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     marginTop: 2,
   },
   seatContainer: {
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
   seatVal: {
     color: COLORS.secondary,
     fontSize: 16,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginTop: 2,
   },
   notchContainer: {
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
   verifiedPassText: {
     color: COLORS.success,
     fontSize: 10,
-    fontWeight: '800',
+    fontFamily: FONTS.extraBold,
     marginLeft: 4,
     letterSpacing: 0.5,
   },
