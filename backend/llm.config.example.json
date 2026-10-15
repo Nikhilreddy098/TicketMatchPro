@@ -1,0 +1,87 @@
+{
+  "_note": "Copy to llm.config.json and point LLM_CONFIG_FILE at it. The Anthropic catalog is built in. The OpenAI and Gemini model ids and prices below are illustrative, taken from third-party pricing roundups in Oct 2026. Check them against each provider's own pricing page before you rely on the cost numbers.",
+  "defaultStrategy": "balanced",
+  "maxModelsPerRequest": 4,
+  "timeoutMs": 120000,
+  "fallbackOnRefusal": true,
+  "retry": { "maxRetriesPerModel": 1, "baseDelayMs": 250, "maxDelayMs": 4000 },
+  "circuitBreaker": { "failureThreshold": 3, "cooldownMs": 30000, "authCooldownMs": 300000 },
+  "budget": { "dailyUsd": 25, "monthlyUsd": 500, "economizeAt": 0.8 },
+  "cache": { "enabledByDefault": false, "ttlMs": 600000, "maxEntries": 500 },
+  "providers": [
+    { "type": "anthropic" },
+    {
+      "type": "openai-compatible",
+      "name": "openai",
+      "baseUrl": "https://api.openai.com/v1",
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "maxTokensField": "max_completion_tokens",
+      "models": [
+        {
+          "id": "gpt-5.6-terra",
+          "contextWindow": 400000,
+          "maxOutputTokens": 128000,
+          "pricing": { "inputPerMTok": 2, "outputPerMTok": 12, "cachedInputPerMTok": 0.2 },
+          "capabilities": ["chat", "vision", "tools", "json", "reasoning"],
+          "qualityScore": 85,
+          "tier": "standard",
+          "supportsTemperature": false,
+          "supportsEffort": true
+        },
+        {
+          "id": "gpt-5.6-luna",
+          "contextWindow": 400000,
+          "maxOutputTokens": 128000,
+          "pricing": { "inputPerMTok": 0.2, "outputPerMTok": 1.2, "cachedInputPerMTok": 0.02 },
+          "capabilities": ["chat", "tools", "json"],
+          "qualityScore": 65,
+          "tier": "economy",
+          "supportsTemperature": false,
+          "supportsEffort": true
+        }
+      ]
+    },
+    {
+      "type": "gemini",
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "models": [
+        {
+          "id": "gemini-3.5-flash",
+          "contextWindow": 1000000,
+          "maxOutputTokens": 65536,
+          "pricing": { "inputPerMTok": 1.5, "outputPerMTok": 9 },
+          "capabilities": ["chat", "vision", "tools", "json", "reasoning", "long_context"],
+          "qualityScore": 80,
+          "tier": "standard"
+        },
+        {
+          "id": "gemini-3.1-flash-lite",
+          "contextWindow": 1000000,
+          "maxOutputTokens": 65536,
+          "pricing": { "inputPerMTok": 0.25, "outputPerMTok": 1.5 },
+          "capabilities": ["chat", "json", "long_context"],
+          "qualityScore": 60,
+          "tier": "economy"
+        }
+      ]
+    },
+    {
+      "type": "openai-compatible",
+      "name": "ollama",
+      "baseUrl": "http://localhost:11434/v1",
+      "maxTokensField": "max_tokens",
+      "models": [
+        {
+          "id": "llama3.3",
+          "contextWindow": 128000,
+          "maxOutputTokens": 8192,
+          "pricing": { "inputPerMTok": 0, "outputPerMTok": 0 },
+          "capabilities": ["chat"],
+          "qualityScore": 55,
+          "tier": "economy",
+          "disabled": true
+        }
+      ]
+    }
+  ]
+}
