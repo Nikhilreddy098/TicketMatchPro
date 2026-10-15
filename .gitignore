@@ -38,3 +38,6 @@ Thumbs.db
 
 # Expo generated
 expo-env.d.ts
+
+# LLM gateway local config
+backend/llm.config.json
